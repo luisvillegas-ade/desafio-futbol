@@ -142,6 +142,13 @@ ordenes: 30 recibidas / 28 aplicadas / 2 fallidas (Cumbre, reintentos r1 OK)
 reclamos (test forzado): 3/3 levantados firmados en <0.5 min
 ```
 
+**Smoke interactivo + reclamos (vie 13, post-fix race):** modo `interactivo`
++ `test_reclamo.py` → forzar-ip sobre `tv.verpartido-hd.test` → 3 reclamos de
+`panaderia-la-espiga.test` → las 3 órdenes IP levantadas firmadas (0.1–0.5 min)
+y reemplazadas por `dominio`. `verificar.py`: `reclamos 3 / resueltos 3`.
+El colateral resultante (3 bloqueos / 4 dominios legítimos) es deliberado:
+es la demo del módulo de reclamos, no un defecto.
+
 **×30 con `--inicio-min 40` (ensayo de cambio de turno):**
 ```
 fases_piratas_bloqueadas: 6 de 7     visibilidad_residual: 30.1 %
