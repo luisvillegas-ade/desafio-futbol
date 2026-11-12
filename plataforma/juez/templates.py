@@ -4,22 +4,39 @@ import json
 
 CSS = """
 body{font-family:system-ui,-apple-system,sans-serif;margin:0;background:#0f172a;color:#e2e8f0}
-a{color:#7dd3fc}
-header{background:#1e293b;padding:14px 24px;display:flex;justify-content:space-between;align-items:center}
-header h1{font-size:18px;margin:0}
-main{padding:24px;max-width:1100px;margin:auto}
-.card{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:16px;margin-bottom:16px}
-.badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600}
+a{color:#7dd3fc;text-decoration:none}
+a:hover{color:#bae6fd;text-decoration:underline}
+header{background:#1e293b;padding:14px 24px;display:flex;justify-content:space-between;
+align-items:center;border-bottom:1px solid #334155;position:sticky;top:0;z-index:10}
+header h1{font-size:18px;margin:0;font-weight:600;letter-spacing:.2px}
+header a{margin-left:14px}
+main{padding:24px;max-width:1200px;margin:auto}
+h2,h3{font-weight:600;color:#f1f5f9}
+.card{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:18px 20px;
+margin-bottom:18px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;
+font-weight:600;white-space:nowrap}
 .b-detectado{background:#475569}.b-elevado{background:#b45309}.b-aprobado{background:#0369a1}
 .b-en_ejecucion{background:#15803d}.b-cerrado{background:#334155}.b-archivado{background:#7f1d1d}
-.peritaje{background:#0b1220;border-left:3px solid #38bdf8;padding:10px 14px;margin:10px 0;font-size:14px}
-button{background:#0369a1;color:#fff;border:0;border-radius:8px;padding:10px 18px;font-size:15px;cursor:pointer}
+.b-recibida{background:#b45309}.b-aplicada{background:#15803d}.b-fallida{background:#b91c1c}
+.b-levantada{background:#6d28d9}.b-vencida{background:#334155}
+.b-recibido{background:#b45309}.b-orden_levantada{background:#15803d}.b-desestimado{background:#334155}
+.peritaje{background:#0b1220;border-left:3px solid #38bdf8;padding:10px 14px;margin:10px 0;
+font-size:14px;border-radius:0 8px 8px 0}
+button{background:#0369a1;color:#fff;border:0;border-radius:8px;padding:10px 18px;
+font-size:14px;font-weight:600;cursor:pointer;transition:background .15s;margin:2px 4px 2px 0}
 button:hover{background:#0284c7}
-button.peligro{background:#b91c1c}
-button.sec{background:#475569}
-table{width:100%;border-collapse:collapse;font-size:14px}
-td,th{padding:8px 10px;border-bottom:1px solid #334155;text-align:left}
-input{padding:10px;border-radius:8px;border:1px solid #334155;background:#0b1220;color:#e2e8f0;width:260px}
+button.peligro{background:#b91c1c}button.peligro:hover{background:#dc2626}
+button.sec{background:#475569}button.sec:hover{background:#64748b}
+table{width:100%;border-collapse:collapse;font-size:14px;background:#1e293b;
+border:1px solid #334155;border-radius:10px;overflow:hidden}
+td,th{padding:9px 12px;border-bottom:1px solid #334155;text-align:left}
+th{background:#0b1220;color:#94a3b8;font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:#243349}
+input{padding:10px 12px;border-radius:8px;border:1px solid #334155;background:#0b1220;
+color:#e2e8f0;width:260px;font-size:14px}
+input:focus{outline:2px solid #0369a1;border-color:#0369a1}
 .mono{font-family:ui-monospace,Consolas,monospace;font-size:13px}
 .aviso{background:#7c2d12;padding:10px 14px;border-radius:8px;margin-bottom:12px}
 """
@@ -99,7 +116,8 @@ def detalle(exp, evidencias, actuaciones, ordenes) -> str:
         for a in actuaciones)
     ords = "".join(
         f"<tr><td class=mono>{_e(o['orden_id'])}</td><td>{_e(o['proveedor_id'])}</td>"
-        f"<td>{_e(o['tipo'])} → {_e(o['objetivo'])}</td><td>{_e(o['estado'])}</td>"
+        f"<td>{_e(o['tipo'])} → {_e(o['objetivo'])}</td>"
+        f"<td><span class='badge b-{_e(o['estado'])}'>{_e(o['estado'])}</span></td>"
         f"<td class=mono>{_e(o['juez_id'])}</td></tr>" for o in ordenes)
     return pagina(f"Expediente {exp['id']}", header(
         f"Expediente {_e(exp['id'])} — {_e(exp['stream_id'])} fase {exp['fase_n']}",
@@ -119,7 +137,7 @@ def transparencia(ordenes, minuto: float) -> str:
     filas = "".join(
         f"<tr><td class=mono>{_e(o['orden_id'])}</td><td>{_e(o['proveedor_id'])}</td>"
         f"<td>{_e(o['tipo'])} → <span class=mono>{_e(o['objetivo'])}</span></td>"
-        f"<td><span class='badge b-en_ejecucion'>{_e(o['estado'])}</span></td>"
+        f"<td><span class='badge b-{_e(o['estado'])}'>{_e(o['estado'])}</span></td>"
         f"<td class=mono>{_e(o['juez_id'])}</td><td class=mono>min {o['vence_min']}</td></tr>"
         for o in ordenes)
     if not filas:
@@ -137,7 +155,8 @@ def reclamos(reclamos_rows) -> str:
     filas = "".join(
         f"<tr><td class=mono>{_e(r['id'])}</td><td class=mono>{_e(r['dominio'])}</td>"
         f"<td>{_e(r['proveedor'])}</td><td>{_e(r['mensaje'])}</td>"
-        f"<td>{_e(r['estado'])}</td></tr>" for r in reclamos_rows)
+        f"<td><span class='badge b-{_e(r['estado'])}'>{_e(r['estado'])}</span></td></tr>"
+        for r in reclamos_rows)
     return (f"<div class=card><h3>Reclamos de terceros</h3>"
             f"<table><tr><th>ID</th><th>Dominio</th><th>Proveedor</th><th>Mensaje</th>"
             f"<th>Estado</th></tr>{filas or '<tr><td colspan=5>Sin reclamos.</td></tr>'}"
