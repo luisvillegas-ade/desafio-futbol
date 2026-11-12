@@ -2,7 +2,76 @@
 
 **Hackathon Argentina Space 2026** · Track Datos y Streaming · Centro de Convenciones de Salta · 11 al 13 de noviembre de 2026
 
-> **Aviso.** Todos los datos de este repositorio son ficticios: proveedores de internet, juzgados, jueces, partidos, dominios e IPs. Los dominios terminan en `.test` o `.example`, las IPs son de documentación (RFC 5737) y los ASN son del rango privado. No se bloquea nada real: todo ocurre dentro del simulador. Este material no es asesoramiento legal.
+---
+
+## Nuestra solución
+
+Una plataforma en **Python 3.9+ estándar, cero dependencias externas**, que corre el circuito completo contra el simulador: detección → expediente judicial con evidencia → firma del juez de turno → despacho paralelo a los 4 proveedores → confirmación → vencimiento automático, más el módulo de reclamos (levantamiento firmado + reemplazo por dominio) y un portal público de transparencia.
+
+**Por qué stdlib puro:** el partido final corre en una máquina que no conocemos; sin `pip install` no hay nada que pueda fallar. Todo el código de la plataforma está en `plataforma/` y fue escrito durante el hackathon; `simulador/`, `datos/`, `evaluacion/` y `ejemplos/` son el material provisto por la organización.
+
+### Cómo correr
+
+```bash
+# Terminal 1 — simulador (en Windows: PYTHONUTF8=1, el print de arranque usa '≈')
+PYTHONUTF8=1 python simulador/servidor.py --escenario datos/escenario_practica.json --acelerar 6
+
+# Terminal 2 — plataforma (desde la raíz del repo)
+python -m plataforma.main --modo auto --reset          # auto-firma (orden marco judicial)
+python -m plataforma.main --modo interactivo --reset   # el juez aprueba cada orden en la web
+python -m plataforma.main --modo auto --reset --servidor http://<ip>:8080   # partido final
+
+# Consola judicial: http://127.0.0.1:8090  (usuarios: laura / martin, clave: demo)
+# Portal público de transparencia: http://127.0.0.1:8090/transparencia
+
+# Terminal 3 — cuando el partido termina (+5 min de gracia)
+python evaluacion/verificar.py --log salida/registro.jsonl
+
+# Exportar los entregables del día 3
+python -m plataforma.main --exportar   # escribe entrega/expediente-ejemplo.json y registro-auditoria.json
+```
+
+Flags de la plataforma: `--modo auto|interactivo` · `--servidor URL` · `--reset` (borra la BD) · `--sin-ui` · `--exportar` · `--puerto-ui`.
+
+Flags útiles del simulador: `--acelerar 60` (partido en ~2 min para iterar) · `--inicio-min 40` (probar el cambio de turno judicial del minuto 50).
+
+### Qué hace (pipeline)
+
+1. **Detección y verificación pericial** (`motor/verificador.py`): polling de `/detecciones` con cursor persistente; contrasta la marca de agua contra `/partido`, excluye licenciatarios en sus dominios autorizados (marca `LIC` en dominio ajeno = pirata retransmitiendo) y consulta `/dns-pasivo` para medir el riesgo colateral de cada IP.
+2. **Expediente digital** (`motor/expediente.py` + `db.py`): un expediente por tupla `(host_stream, ip_servidor)`; un cambio de IP/host abre una ampliación cautelar (fase nueva del mismo stream). Cada actuación se numera y encadena con hash SHA-256 (cadena de custodia, append-only).
+3. **Regla IP vs. dominio:** si la IP aloja dominios ajenos al infractor (CDN/hosting compartido) → orden por `dominio`; si es dedicada → orden por `ip`. Si el DNS pasivo no responde, se elige `dominio` (nunca genera daño colateral).
+4. **Firma judicial con turnos** (`motor/turnos.py`): si falta menos de ~0.6 min para el fin del turno (cambio en el minuto 50), la firma espera al borde y la orden sale firmada por el juez entrante — cero órdenes fuera de turno.
+5. **Despacho paralelo y reintentos** (`motor/dispatcher.py`): un worker por `(expediente, proveedor)`; monitor consolidado (4 consultas por ciclo, no una por orden). FibraValle solo acepta `dominio` — se traduce la orden para ese proveedor. Las fallas de Cumbre (~35 %) se reintentan con `orden_id` nuevo (`ord-<exp>-<prov>-r<n>`) y firma recalculada.
+6. **Reclamos** (`motor/reclamos.py`): polling de `/reclamos`; ubica la orden activa que afecta al dominio reclamado, la levanta con firma judicial y despacha un reemplazo por `dominio` más preciso.
+7. **Consola judicial** (`juez/`): login, bandeja con pre-dictamen pericial automático, aprobar / forzar-IP / rechazar, y `/transparencia` público. En `--modo auto` la firma es inmediata (orden marco: la narrativa de nuestra propuesta normativa).
+
+### Resultados en el escenario de práctica
+
+`verificar.py` sobre la última corrida completa (desde minuto 0, aceleración ×60):
+
+```
+fases piratas bloqueadas: 7 de 7      visibilidad residual: 5,6 %
+clientes cubiertos: 100 % en todas las fases   (primer bloqueo: 0,5–5,5 min)
+daño colateral / falsos positivos / rechazos / fuera de turno / IP post-partido: 0
+reclamos (provocados para la demo): 3/3 levantados firmados en < 0,5 min
+```
+
+### Supuestos y decisiones de diseño
+
+- **SQLite única como SSOT** (`plataforma/datos_app/plataforma.db`) con un lock global: la carga es baja y elimina cualquier problema de concurrencia.
+- **`vence_min` entero = `fin_min` del partido**: los bloqueos por IP vencen solos al terminar (propuesta normativa, punto 4).
+- **Auto-firma = orden marco judicial**: en `modo auto` el juzgado libró una orden marco que autoriza a la plataforma a incorporar objetivos verificados pericialmente durante el evento; el modo `interactivo` existe para demostrar la firma manual en la consola.
+- Las claves de firma se leen de `datos/juzgados.json` (las del material del desafío; no hay secretos reales en el repo).
+
+### Entregables
+
+- `entrega/propuesta-normativa.md` — 1 página, 5 puntos.
+- `entrega/expediente-ejemplo.json` y `entrega/registro-auditoria.json` — exportados de una corrida real con `--exportar`.
+- Bitácora técnica completa (quirks del simulador verificados, arquitectura, resultados): `AGENTS.md`.
+
+---
+
+*A continuación, la consigna original del desafío provista por la organización.*
 
 ## Contexto
 
