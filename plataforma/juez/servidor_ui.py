@@ -8,6 +8,7 @@ Rutas:
   POST /exp/<id>/forzar-ip                      — aprobar forzando tipo IP (demo reclamos)
   POST /exp/<id>/rechazar                       — archivar
   GET  /transparencia                           — público, sin login
+  GET  /monitor, /monitor/datos                 — monitor en vivo (público)
 """
 import secrets
 import threading
@@ -16,18 +17,22 @@ from urllib.parse import parse_qs, urlparse
 
 from .. import config, db
 from . import templates as T
+from . import monitor as M
 from ..motor import expediente as ex
 
 SESIONES = {}  # sid -> juez dict {"id","nombre"}
 
 
 class ServidorUI(threading.Thread):
-    def __init__(self, reloj, turnos, dispatcher, puerto: int):
+    def __init__(self, reloj, turnos, dispatcher, puerto: int,
+                 modo: str = "auto", poller=None):
         super().__init__(daemon=True, name="Thread-WebUI")
         self.reloj = reloj
         self.turnos = turnos
         self.dispatcher = dispatcher
         self.puerto = puerto
+        self.modo = modo
+        self.poller = poller
         self.httpd = None
 
     def run(self) -> None:
@@ -42,6 +47,13 @@ class ServidorUI(threading.Thread):
                 b = s.encode("utf-8")
                 self.send_response(estado)
                 self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Content-Length", str(len(b)))
+                self.end_headers()
+                self.wfile.write(b)
+
+            def _json(self, b: bytes, estado=200):
+                self.send_response(estado)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
                 self.send_header("Content-Length", str(len(b)))
                 self.end_headers()
                 self.wfile.write(b)
@@ -71,6 +83,11 @@ class ServidorUI(threading.Thread):
                 if partes == ["transparencia"]:
                     ordenes = db.q("SELECT * FROM ordenes ORDER BY id")
                     return self._html(T.transparencia(ordenes, ui.reloj.ahora()))
+                if partes == ["monitor"]:
+                    return self._html(M.pagina())
+                if partes == ["monitor", "datos"]:
+                    return self._json(M.datos_json(ui.reloj, ui.turnos,
+                                                   ui.modo, ui.poller))
                 sesion = self._sesion()
                 if not sesion:
                     return self._redirect("/login")

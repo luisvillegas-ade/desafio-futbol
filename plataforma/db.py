@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS evidencias (
     marca_extraida TEXT,
     marca_valida INTEGER,
     dominios_en_ip TEXT,                 -- JSON array del DNS pasivo
+    promocion TEXT,                      -- JSON: canales de difusión (X/Telegram/Discord)
     riesgo_colateral_detectado INTEGER
 );
 
@@ -105,6 +106,10 @@ def conectar() -> sqlite3.Connection:
         _conn.execute("PRAGMA synchronous=OFF")  # velocidad en Windows; la cadena
                                                  # de custodia no depende de fsync
         _conn.executescript(ESQUEMA)
+        cols = [r["name"] for r in
+                _conn.execute("PRAGMA table_info(evidencias)")]
+        if "promocion" not in cols:
+            _conn.execute("ALTER TABLE evidencias ADD COLUMN promocion TEXT")
     return _conn
 
 

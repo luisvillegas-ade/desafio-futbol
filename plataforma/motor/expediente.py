@@ -39,10 +39,12 @@ def agregar_evidencia(exp_id: str, det: dict, dominios_dns, riesgo: bool,
     db.ejecutar(
         "INSERT INTO evidencias(expediente_id,deteccion_id,minuto,stream_url,"
         "captura_b64,captura_sha256,marca_extraida,marca_valida,dominios_en_ip,"
-        "riesgo_colateral_detectado) VALUES(?,?,?,?,?,?,?,?,?,?)",
+        "promocion,riesgo_colateral_detectado) VALUES(?,?,?,?,?,?,?,?,?,?,?)",
         (exp_id, det["id"], det["minuto"], det.get("stream_url"), b64, sha,
          det.get("marca_de_agua_extraida") or "", 1 if marca_valida else 0,
-         json.dumps(dominios_dns), 1 if riesgo else 0))
+         json.dumps(dominios_dns),
+         json.dumps(det.get("promocion") or [], ensure_ascii=False),
+         1 if riesgo else 0))
 
 
 def set_estado(exp_id: str, estado: str) -> None:

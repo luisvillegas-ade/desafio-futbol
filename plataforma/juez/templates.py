@@ -95,7 +95,8 @@ def bandeja(expedientes, juez: dict, turno_txt: str, minuto: float) -> str:
         filas = "<tr><td colspan=6>Sin expedientes todavía.</td></tr>"
     return pagina("Bandeja del juez", header(
         "Consola Judicial — Bandeja de expedientes",
-        f"{_e(juez['nombre'])} · <a href='/transparencia'>Transparencia</a> · "
+        f"{_e(juez['nombre'])} · <a href='/monitor'>Monitor</a> · "
+        f"<a href='/transparencia'>Transparencia</a> · "
         f"<a href='/salir'>Salir</a>") + f"""
 <main>
 <div class=peritaje>Minuto de partido <b>{minuto:.1f}</b> · { _e(turno_txt) }</div>
@@ -105,13 +106,19 @@ def bandeja(expedientes, juez: dict, turno_txt: str, minuto: float) -> str:
 
 
 def detalle(exp, evidencias, actuaciones, ordenes) -> str:
+    def _promo(ev):
+        canales = json.loads(ev["promocion"] or "[]")
+        if not canales:
+            return ""
+        txt = ", ".join(f"{_e(c.get('red'))}" for c in canales)
+        return f"<br>Difundido en: {txt}"
     ev = "".join(
         f"<div class=peritaje>Detección <b>{_e(x['deteccion_id'])}</b> min {x['minuto']} · "
         f"marca <span class=mono>{_e(x['marca_extraida'])}</span> · "
-        f"SHA-256 captura <span class=mono>{_e(x['captura_sha256'][:20])}…</span><br>"
+        f"SHA-256 captura <span class=mono>{_e(x['captura_sha256'][:20])}…</span>{_promo(x)}<br>"
         f"DNS pasivo: {_e(x['dominios_en_ip'])}</div>" for x in evidencias)
     acts = "".join(
-        f"<tr><td class=mono>{a['n']}</td><td>{_e(a['tipo'])}</td><td>{_e(a['detalle'])}</td>"
+        f"<tr><td class=mono>F°{a['n']}</td><td>{_e(a['tipo'])}</td><td>{_e(a['detalle'])}</td>"
         f"<td class=mono>{a['minuto']:.2f}</td><td class=mono>{_e(a['hash_actual'][:14])}…</td></tr>"
         for a in actuaciones)
     ords = "".join(
@@ -120,16 +127,16 @@ def detalle(exp, evidencias, actuaciones, ordenes) -> str:
         f"<td><span class='badge b-{_e(o['estado'])}'>{_e(o['estado'])}</span></td>"
         f"<td class=mono>{_e(o['juez_id'])}</td></tr>" for o in ordenes)
     return pagina(f"Expediente {exp['id']}", header(
-        f"Expediente {_e(exp['id'])} — {_e(exp['stream_id'])} fase {exp['fase_n']}",
+        f"{_e(exp['id'])} — «{_e(exp['stream_id'])}» s/ medida cautelar (fase {exp['fase_n']})",
         "<a href='/'>← Bandeja</a>") + f"""
 <main>
 <div class=card><b>Stream:</b> <span class=mono>{_e(exp['host_stream'])} · {_e(exp['ip_servidor'])} · ASN {_e(exp['asn'])}</span><br>
 <b>Medida sugerida:</b> {_e(exp['tipo_bloqueo_recomendado'])} · <b>Estado:</b> {_e(exp['estado'])}</div>
-<h3>Evidencia pericial</h3>{ev}
-<h3>Órdenes despachadas</h3>
+<h3>Peritaje técnico</h3>{ev}
+<h3>Órdenes libradas</h3>
 <table><tr><th>Orden</th><th>Proveedor</th><th>Objetivo</th><th>Estado</th><th>Juez</th></tr>{ords}</table>
-<h3>Actuaciones (cadena de custodia)</h3>
-<table><tr><th>#</th><th>Tipo</th><th>Detalle</th><th>Min</th><th>Hash</th></tr>{acts}</table>
+<h3>Actuaciones — cadena de custodia (fojas)</h3>
+<table><tr><th>Foja</th><th>Tipo</th><th>Detalle</th><th>Min</th><th>Hash</th></tr>{acts}</table>
 </main>""")
 
 
@@ -144,7 +151,7 @@ def transparencia(ordenes, minuto: float) -> str:
         filas = "<tr><td colspan=6>Aún no se dictaron medidas cautelares.</td></tr>"
     return pagina("Registro público de transparencia", header(
         "Registro Público de Transparencia — Medidas cautelares",
-        "<a href='/'>Consola</a>") + f"""
+        "<a href='/monitor'>Monitor</a> · <a href='/'>Consola</a>") + f"""
 <main><div class=peritaje>Minuto de partido {minuto:.1f}. Las órdenes por IP vencen
 automáticamente al finalizar el partido.</div>
 <table><tr><th>Orden</th><th>Proveedor</th><th>Objetivo</th><th>Estado</th>
