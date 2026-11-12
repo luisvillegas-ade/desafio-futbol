@@ -48,10 +48,12 @@ def _e(x) -> str:
     return html.escape(str(x))
 
 
-def pagina(titulo: str, cuerpo: str, extra_head: str = "") -> str:
+def pagina(titulo: str, cuerpo: str, extra_head: str = "",
+           refresh: bool = True) -> str:
+    meta = "<meta http-equiv=refresh content=4>" if refresh else ""
     return (f"<!doctype html><html lang=es><head><meta charset=utf-8>"
             f"<meta name=viewport content='width=device-width,initial-scale=1'>"
-            f"<meta http-equiv=refresh content=4>"
+            f"{meta}"
             f"<title>{_e(titulo)}</title><style>{CSS}</style>{extra_head}</head>"
             f"<body>{cuerpo}</body></html>")
 
@@ -73,7 +75,7 @@ def login(error: str = "") -> str:
 jueces: laura · martin — firman solo de turno<br>
 tramitación: secretario · operador — pases, revisión, informes<br>
 admin — visión completa del sistema</p>
-</div></main>""")
+</div></main>""", refresh=False)
 
 
 def bandeja(expedientes, juez: dict, turno_txt: str, minuto: float) -> str:
@@ -328,4 +330,4 @@ de turno y ordena el levantamiento y su reemplazo por una medida más precisa.</
 <p><input name=dominio placeholder="midominio.test" required></p>
 <p><input name=mensaje placeholder="Motivo (ej: mi tienda no carga desde hace 10 min)"></p>
 <p><button type=submit>Presentar reclamo</button></p>
-</form></div></main>""")
+</form></div></main>""", refresh=False)
