@@ -22,11 +22,19 @@ def dominio_base(host: str) -> str:
 
 class Verificador:
     def __init__(self, cliente):
-        st, partido = cliente.get("/partido")
-        if st != 200:
-            raise RuntimeError(f"No se pudo leer /partido: {st}")
-        self.partido = partido
         self.cliente = cliente
+        # reintenta hasta ~30 s: el sim puede no estar escuchando aún
+        import time as _t
+        espera = 0.5
+        while True:
+            st, partido = cliente.get("/partido")
+            if st == 200:
+                break
+            if espera > 32:
+                raise RuntimeError(f"No se pudo leer /partido: {st}")
+            _t.sleep(espera)
+            espera *= 2
+        self.partido = partido
         self.prefijos = [p["prefijo"] for p in partido["marcas_de_agua_validas"]]
         self.licenciatarios = partido.get("licenciatarios", [])
         self.fin_min = float(partido["fin_min"])
