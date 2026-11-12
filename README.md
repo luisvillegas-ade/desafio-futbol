@@ -392,7 +392,7 @@ Lo que se evalúa es lo que está en el repo a la hora de cierre. Al cierre, la 
 |---|---|
 | Miércoles 11 de noviembre | Apertura, formación de equipos y presentación del desafío. Partidos de práctica. |
 | Jueves 12 de noviembre | Desarrollo y mentorías. Partidos de práctica. |
-| Viernes 13 de noviembre | Partido final con un escenario que nadie vio, entrega, pitch y premiación. |
+| Viernes 13 de noviembre | Partido final con un escenario que nadie vio. Cierre de entregas a las 13. Después, pitch y premiación. |
 
 Los horarios exactos los publica la organización. En el partido final, la organización corre una instancia del simulador por equipo, posiblemente acelerada, y cada equipo conecta su plataforma a la dirección que le asignen.
 
