@@ -35,8 +35,8 @@ class Dispatcher:
         self.cliente = cliente
         self.reloj = reloj
         self.turnos = turnos
-        st, provs = cliente.get("/proveedores")
-        self.proveedores = {p["id"]: p for p in provs} if st == 200 else {}
+        self.proveedores = {}
+        self._refrescar_proveedores()
         self._despachados = set()
         self._lock = threading.Lock()
         # seguimiento consolidado de órdenes
@@ -47,10 +47,26 @@ class Dispatcher:
         threading.Thread(target=self._monitor, daemon=True,
                          name="Thread-MonitorOrdenes").start()
 
+    def _refrescar_proveedores(self) -> None:
+        """Carga /proveedores reintentando hasta ~30 s: el sim puede todavía
+        no estar escuchando cuando arranca la plataforma."""
+        espera = 0.5
+        while espera <= 32:
+            st, provs = self.cliente.get("/proveedores")
+            if st == 200 and provs:
+                self.proveedores = {p["id"]: p for p in provs}
+                return
+            time.sleep(espera)
+            espera *= 2
+        print("[dispatcher] sin /proveedores: no se puede despachar",
+              flush=True)
+
     # -- despacho -----------------------------------------------------------
 
     def despachar_expediente(self, exp: dict) -> None:
         """Dispara un worker por proveedor para la tupla del expediente."""
+        if not self.proveedores:
+            self._refrescar_proveedores()
         with self._lock:
             if exp["id"] in self._despachados:
                 return
@@ -78,6 +94,12 @@ class Dispatcher:
             if self.reloj.ahora() >= vence:
                 return
             _, jz, juez = self.turnos.esperar_firma_segura()
+            if jz is None:
+                db.actuacion(
+                    exp_id, "despacho",
+                    f"Sin juez de turno a min {self.reloj.ahora():.1f}: "
+                    f"orden a {pid} no librada", self.reloj.ahora())
+                return
             if self.reloj.ahora() >= vence:
                 return
             orden_id = f"ord-{exp_id.split('-')[-1]}-{pid}-r{intento}"

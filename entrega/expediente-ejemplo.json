@@ -8,6 +8,7 @@
     "asn": 64600,
     "tipo_bloqueo_recomendado": "ip",
     "estado": "en_ejecucion",
+    "dependencia": "despacho",
     "juez_asignado": null,
     "creado_min": 2.0,
     "cerrado_min": null
@@ -24,6 +25,7 @@
       "marca_extraida": "LP26-PRA-OFI-S048211",
       "marca_valida": 1,
       "dominios_en_ip": "[\"s1.pelotaya.test\", \"s1-respaldo.pelotaya.test\"]",
+      "promocion": "[{\"red\": \"x\", \"url\": \"https://x.example/futbolya_ok/status/1001\", \"minuto\": 1.0}]",
       "riesgo_colateral_detectado": 0
     },
     {
@@ -37,6 +39,7 @@
       "marca_extraida": "LP26-PRA-OFI-S048211",
       "marca_valida": 1,
       "dominios_en_ip": "[\"s1.pelotaya.test\", \"s1-respaldo.pelotaya.test\"]",
+      "promocion": "[{\"red\": \"x\", \"url\": \"https://x.example/futbolya_ok/status/1001\", \"minuto\": 1.0}]",
       "riesgo_colateral_detectado": 0
     },
     {
@@ -50,6 +53,7 @@
       "marca_extraida": "LP26-PRA-OFI-S048211",
       "marca_valida": 1,
       "dominios_en_ip": "[\"s1.pelotaya.test\", \"s1-respaldo.pelotaya.test\"]",
+      "promocion": "[{\"red\": \"x\", \"url\": \"https://x.example/futbolya_ok/status/1001\", \"minuto\": 1.0}]",
       "riesgo_colateral_detectado": 0
     },
     {
@@ -63,6 +67,7 @@
       "marca_extraida": "LP26-PRA-OFI-S048211",
       "marca_valida": 1,
       "dominios_en_ip": "[\"s1.pelotaya.test\", \"s1-respaldo.pelotaya.test\"]",
+      "promocion": "[{\"red\": \"x\", \"url\": \"https://x.example/futbolya_ok/status/1001\", \"minuto\": 1.0}]",
       "riesgo_colateral_detectado": 0
     }
   ],
@@ -74,7 +79,7 @@
       "tipo": "deteccion",
       "detalle": "D-0001 — señal oficial pirata en s1.pelotaya.test (203.0.113.10, ASN 64600), marca LP26-PRA-OFI-S048211",
       "minuto": 2.0,
-      "timestamp_iso": "2026-11-12T16:11:53",
+      "timestamp_iso": "2026-11-12T18:23:59",
       "hash_prev": "GENESIS",
       "hash_actual": "6bf1f9b1485c12918e82a5c045ddb305f6450ea87cd43842bbba4a30420c6f06"
     },
@@ -85,108 +90,108 @@
       "tipo": "peritaje",
       "detalle": "Riesgo colateral nulo (IP dedicada). Medida sugerida: bloqueo por ip -> 203.0.113.10 hasta min 105",
       "minuto": 2.0,
-      "timestamp_iso": "2026-11-12T16:11:53",
+      "timestamp_iso": "2026-11-12T18:23:59",
       "hash_prev": "6bf1f9b1485c12918e82a5c045ddb305f6450ea87cd43842bbba4a30420c6f06",
       "hash_actual": "a0d7498408b86721b77bd7b12006bb8e0c7502f49bbdbf16a84b4303ad8551b8"
     },
     {
-      "id": 7,
+      "id": 5,
       "expediente_id": "EXP-2026-000001",
       "n": 3,
       "tipo": "firma_orden",
       "detalle": "Orden ord-000001-aurora-r0 (ip -> 203.0.113.10, vence 105) firmada por jueza-laura-ficticia y despachada a aurora",
-      "minuto": 7.1059999999996215,
-      "timestamp_iso": "2026-11-12T16:11:53",
+      "minuto": 6.770999999995402,
+      "timestamp_iso": "2026-11-12T18:23:59",
       "hash_prev": "a0d7498408b86721b77bd7b12006bb8e0c7502f49bbdbf16a84b4303ad8551b8",
-      "hash_actual": "d01223655727cf118cf2889d0806ecc1e4c0343069744105403f6e095c4806af"
+      "hash_actual": "fb8530436ae23d269145a1a3bedc9165693f499f3bf7e9e6ff105016ebda35e3"
+    },
+    {
+      "id": 6,
+      "expediente_id": "EXP-2026-000001",
+      "n": 4,
+      "tipo": "firma_orden",
+      "detalle": "Orden ord-000001-andina-r0 (ip -> 203.0.113.10, vence 105) firmada por jueza-laura-ficticia y despachada a andina",
+      "minuto": 6.770999999995402,
+      "timestamp_iso": "2026-11-12T18:23:59",
+      "hash_prev": "fb8530436ae23d269145a1a3bedc9165693f499f3bf7e9e6ff105016ebda35e3",
+      "hash_actual": "d511f6927ea7cc7f201a89c7bb1c336e04c6e9c800d160c9fe209069b0278b02"
     },
     {
       "id": 8,
       "expediente_id": "EXP-2026-000001",
-      "n": 4,
-      "tipo": "firma_orden",
-      "detalle": "Orden ord-000001-valle-r0 (dominio -> s1.pelotaya.test, vence 105) firmada por jueza-laura-ficticia y despachada a valle",
-      "minuto": 7.1059999999996215,
-      "timestamp_iso": "2026-11-12T16:11:53",
-      "hash_prev": "d01223655727cf118cf2889d0806ecc1e4c0343069744105403f6e095c4806af",
-      "hash_actual": "164103b297759b56d22d850fcd3222b0f0d605dddc840c4206d6449ba45bb9e6"
-    },
-    {
-      "id": 9,
-      "expediente_id": "EXP-2026-000001",
       "n": 5,
       "tipo": "firma_orden",
-      "detalle": "Orden ord-000001-andina-r0 (ip -> 203.0.113.10, vence 105) firmada por jueza-laura-ficticia y despachada a andina",
-      "minuto": 7.1059999999996215,
-      "timestamp_iso": "2026-11-12T16:11:53",
-      "hash_prev": "164103b297759b56d22d850fcd3222b0f0d605dddc840c4206d6449ba45bb9e6",
-      "hash_actual": "a420de1bced98a13438709652c4922bf0bcc05de28608b4823b355064b9e723c"
+      "detalle": "Orden ord-000001-valle-r0 (dominio -> s1.pelotaya.test, vence 105) firmada por jueza-laura-ficticia y despachada a valle",
+      "minuto": 6.770999999995402,
+      "timestamp_iso": "2026-11-12T18:23:59",
+      "hash_prev": "d511f6927ea7cc7f201a89c7bb1c336e04c6e9c800d160c9fe209069b0278b02",
+      "hash_actual": "d6593a5ec7685c3f19e464300a52f33204ace4ac286701f359be27ee678afaab"
     },
     {
-      "id": 10,
+      "id": 14,
       "expediente_id": "EXP-2026-000001",
       "n": 6,
       "tipo": "firma_orden",
       "detalle": "Orden ord-000001-cumbre-r0 (ip -> 203.0.113.10, vence 105) firmada por jueza-laura-ficticia y despachada a cumbre",
-      "minuto": 7.1059999999996215,
-      "timestamp_iso": "2026-11-12T16:11:53",
-      "hash_prev": "a420de1bced98a13438709652c4922bf0bcc05de28608b4823b355064b9e723c",
-      "hash_actual": "cb994960c38a5c23a6a0b7afd807a7739c0698aea130d379e23465e0163e570d"
+      "minuto": 6.786999999998661,
+      "timestamp_iso": "2026-11-12T18:23:59",
+      "hash_prev": "d6593a5ec7685c3f19e464300a52f33204ace4ac286701f359be27ee678afaab",
+      "hash_actual": "4aeec665fef42543fef6316cf9b072c1e6f5163aa7899f4b25b13c0ecd484676"
     },
     {
       "id": 15,
       "expediente_id": "EXP-2026-000001",
       "n": 7,
       "tipo": "confirmacion",
-      "detalle": "aurora aplicó ord-000001-aurora-r0 en el minuto 7.55",
-      "minuto": 7.954000000000961,
-      "timestamp_iso": "2026-11-12T16:11:54",
-      "hash_prev": "cb994960c38a5c23a6a0b7afd807a7739c0698aea130d379e23465e0163e570d",
-      "hash_actual": "67dec07ebb0aa14ae8ae8c00f3da614ef62e9f85f45c5860c08d31652a5d210b"
+      "detalle": "aurora aplicó ord-000001-aurora-r0 en el minuto 7.222",
+      "minuto": 7.5769999999986615,
+      "timestamp_iso": "2026-11-12T18:24:00",
+      "hash_prev": "4aeec665fef42543fef6316cf9b072c1e6f5163aa7899f4b25b13c0ecd484676",
+      "hash_actual": "3ebc8632d69282f38aa949279f901e97800a1b650d8498e0d160ab1b225e1488"
     },
     {
-      "id": 24,
+      "id": 18,
       "expediente_id": "EXP-2026-000001",
       "n": 8,
       "tipo": "confirmacion",
-      "detalle": "andina aplicó ord-000001-andina-r0 en el minuto 9.616",
-      "minuto": 9.771000000002678,
-      "timestamp_iso": "2026-11-12T16:11:56",
-      "hash_prev": "67dec07ebb0aa14ae8ae8c00f3da614ef62e9f85f45c5860c08d31652a5d210b",
-      "hash_actual": "c59865187bfb091b7b9f6729f41f2a5bd9cefd58af67e1d47f670e596c4a78d6"
+      "detalle": "andina aplicó ord-000001-andina-r0 en el minuto 9.272",
+      "minuto": 9.39399999999674,
+      "timestamp_iso": "2026-11-12T18:24:02",
+      "hash_prev": "3ebc8632d69282f38aa949279f901e97800a1b650d8498e0d160ab1b225e1488",
+      "hash_actual": "ee821c035b1c553d95c87526b641739085256d376bebe2ce851fc4fa1985cffe"
     },
     {
-      "id": 27,
+      "id": 26,
       "expediente_id": "EXP-2026-000001",
       "n": 9,
       "tipo": "despacho",
       "detalle": "cumbre reportó falla en ord-000001-cumbre-r0 (Error interno del proveedor. Reenviar la orden con un nuevo orden_id.). Reenviando.",
-      "minuto": 11.094999999999418,
-      "timestamp_iso": "2026-11-12T16:11:57",
-      "hash_prev": "c59865187bfb091b7b9f6729f41f2a5bd9cefd58af67e1d47f670e596c4a78d6",
-      "hash_actual": "3b41ca7eeabfe07823163a3f22cc250ca7ad81a1dc390e0140650bff9357bc05"
+      "minuto": 10.70199999999866,
+      "timestamp_iso": "2026-11-12T18:24:03",
+      "hash_prev": "ee821c035b1c553d95c87526b641739085256d376bebe2ce851fc4fa1985cffe",
+      "hash_actual": "263fdfa740599978be7fe89342dc0a231088ab07dbb4a4b131187b6dd7033b72"
     },
     {
-      "id": 29,
+      "id": 28,
       "expediente_id": "EXP-2026-000001",
       "n": 10,
       "tipo": "despacho",
       "detalle": "Orden ord-000001-cumbre-r1 (ip -> 203.0.113.10, vence 105) firmada por jueza-laura-ficticia y despachada a cumbre",
-      "minuto": 11.11099999999904,
-      "timestamp_iso": "2026-11-12T16:11:57",
-      "hash_prev": "3b41ca7eeabfe07823163a3f22cc250ca7ad81a1dc390e0140650bff9357bc05",
-      "hash_actual": "ef3429db58168b2ba5f1cedf98ae96c0453d7192fd1ae86a316a8cdc60d34d63"
+      "minuto": 10.70199999999866,
+      "timestamp_iso": "2026-11-12T18:24:03",
+      "hash_prev": "263fdfa740599978be7fe89342dc0a231088ab07dbb4a4b131187b6dd7033b72",
+      "hash_actual": "be68a85d9717502c063a1bfca0debaf93ce1acec31605bc6e3c475eee655f0c9"
     },
     {
       "id": 30,
       "expediente_id": "EXP-2026-000001",
       "n": 11,
       "tipo": "confirmacion",
-      "detalle": "valle aplicó ord-000001-valle-r0 en el minuto 11.847",
-      "minuto": 11.956999999998661,
-      "timestamp_iso": "2026-11-12T16:11:58",
-      "hash_prev": "ef3429db58168b2ba5f1cedf98ae96c0453d7192fd1ae86a316a8cdc60d34d63",
-      "hash_actual": "69365087c0f4ca8d87d44d6137ed162e81a971647ec257e751f5152241b657c1"
+      "detalle": "valle aplicó ord-000001-valle-r0 en el minuto 11.503",
+      "minuto": 11.995,
+      "timestamp_iso": "2026-11-12T18:24:04",
+      "hash_prev": "be68a85d9717502c063a1bfca0debaf93ce1acec31605bc6e3c475eee655f0c9",
+      "hash_actual": "b7b0cc88d4ec5c451e88863def551c16a42df1ca9c4976c82878d73e9c873284"
     },
     {
       "id": 31,
@@ -195,20 +200,20 @@
       "tipo": "deteccion",
       "detalle": "D-0005 — señal oficial pirata en s1.pelotaya.test (203.0.113.10, ASN 64600), marca LP26-PRA-OFI-S048211",
       "minuto": 12.0,
-      "timestamp_iso": "2026-11-12T16:11:59",
-      "hash_prev": "69365087c0f4ca8d87d44d6137ed162e81a971647ec257e751f5152241b657c1",
-      "hash_actual": "8093bec966dc5a68107e79a1263d90909b9ee648f476a71bc0e3eab82f8a95fd"
+      "timestamp_iso": "2026-11-12T18:24:04",
+      "hash_prev": "b7b0cc88d4ec5c451e88863def551c16a42df1ca9c4976c82878d73e9c873284",
+      "hash_actual": "9c594cbe1a1895b2ca9f6ed0b084dd14be667d4d9f34cb6a1315d8f199ed150a"
     },
     {
       "id": 36,
       "expediente_id": "EXP-2026-000001",
       "n": 13,
       "tipo": "confirmacion",
-      "detalle": "cumbre aplicó ord-000001-cumbre-r1 en el minuto 14.704",
-      "minuto": 15.077999999998283,
-      "timestamp_iso": "2026-11-12T16:12:01",
-      "hash_prev": "8093bec966dc5a68107e79a1263d90909b9ee648f476a71bc0e3eab82f8a95fd",
-      "hash_actual": "edd37b0e0e357217f8e621178ef961501ff1f81a2a02b0c1df4da596644f9754"
+      "detalle": "cumbre aplicó ord-000001-cumbre-r1 en el minuto 14.298",
+      "minuto": 14.68899999999674,
+      "timestamp_iso": "2026-11-12T18:24:07",
+      "hash_prev": "9c594cbe1a1895b2ca9f6ed0b084dd14be667d4d9f34cb6a1315d8f199ed150a",
+      "hash_actual": "5dcf00126d67b0abd73d9081010f9700f5543c2d5af2fae48d9e17d3d99ec19a"
     },
     {
       "id": 41,
@@ -217,9 +222,9 @@
       "tipo": "deteccion",
       "detalle": "D-0009 — señal oficial pirata en s1.pelotaya.test (203.0.113.10, ASN 64600), marca LP26-PRA-OFI-S048211",
       "minuto": 22.0,
-      "timestamp_iso": "2026-11-12T16:12:08",
-      "hash_prev": "edd37b0e0e357217f8e621178ef961501ff1f81a2a02b0c1df4da596644f9754",
-      "hash_actual": "061a4912e847fd4c159819ea2524fe218dfb0a8e6793da3375a3bb2578136bb8"
+      "timestamp_iso": "2026-11-12T18:24:15",
+      "hash_prev": "5dcf00126d67b0abd73d9081010f9700f5543c2d5af2fae48d9e17d3d99ec19a",
+      "hash_actual": "ed80faee1b4e5c12b4e6fc0022c50bc5a7d0f8c13c116888e7a0bebd6a925e2f"
     },
     {
       "id": 44,
@@ -228,9 +233,9 @@
       "tipo": "deteccion",
       "detalle": "D-0012 — señal oficial pirata en s1.pelotaya.test (203.0.113.10, ASN 64600), marca LP26-PRA-OFI-S048211",
       "minuto": 32.0,
-      "timestamp_iso": "2026-11-12T16:12:18",
-      "hash_prev": "061a4912e847fd4c159819ea2524fe218dfb0a8e6793da3375a3bb2578136bb8",
-      "hash_actual": "082ef4fa49ac9f343caf558e0dc248c9dfc6bc4425ec5cafa594884246b27366"
+      "timestamp_iso": "2026-11-12T18:24:24",
+      "hash_prev": "ed80faee1b4e5c12b4e6fc0022c50bc5a7d0f8c13c116888e7a0bebd6a925e2f",
+      "hash_actual": "f01c4fd0cf598deae40cf1fe534b655b4d2c2aeb2e4dff5a6fc159f8849943e3"
     }
   ],
   "ordenes": [
@@ -247,27 +252,11 @@
       "firma": "d96137ce692c8df016073b65f324d3b9858eb9f2ddf49819134ef8aa66ac8a32",
       "estado": "vencida",
       "intento": 0,
-      "minuto_envio": 7.1059999999996215,
-      "minuto_aplicada": 7.55
+      "minuto_envio": 6.770999999995402,
+      "minuto_aplicada": 7.222
     },
     {
       "id": 2,
-      "orden_id": "ord-000001-valle-r0",
-      "expediente_id": "EXP-2026-000001",
-      "proveedor_id": "valle",
-      "tipo": "dominio",
-      "objetivo": "s1.pelotaya.test",
-      "vence_min": 105,
-      "juzgado_id": "jg-centro-3",
-      "juez_id": "jueza-laura-ficticia",
-      "firma": "a325eeaed900c96102b94fddc0d499ff5a0bfaf581cc14385b12834a370c5602",
-      "estado": "vencida",
-      "intento": 0,
-      "minuto_envio": 7.1059999999996215,
-      "minuto_aplicada": 11.847
-    },
-    {
-      "id": 3,
       "orden_id": "ord-000001-andina-r0",
       "expediente_id": "EXP-2026-000001",
       "proveedor_id": "andina",
@@ -279,11 +268,27 @@
       "firma": "e5aedc4fde3e089576f4556569b2edcb002725af8295a75c16cc5a82f6779195",
       "estado": "vencida",
       "intento": 0,
-      "minuto_envio": 7.1059999999996215,
-      "minuto_aplicada": 9.616
+      "minuto_envio": 6.770999999995402,
+      "minuto_aplicada": 9.272
     },
     {
-      "id": 4,
+      "id": 3,
+      "orden_id": "ord-000001-valle-r0",
+      "expediente_id": "EXP-2026-000001",
+      "proveedor_id": "valle",
+      "tipo": "dominio",
+      "objetivo": "s1.pelotaya.test",
+      "vence_min": 105,
+      "juzgado_id": "jg-centro-3",
+      "juez_id": "jueza-laura-ficticia",
+      "firma": "a325eeaed900c96102b94fddc0d499ff5a0bfaf581cc14385b12834a370c5602",
+      "estado": "vencida",
+      "intento": 0,
+      "minuto_envio": 6.770999999995402,
+      "minuto_aplicada": 11.503
+    },
+    {
+      "id": 8,
       "orden_id": "ord-000001-cumbre-r0",
       "expediente_id": "EXP-2026-000001",
       "proveedor_id": "cumbre",
@@ -295,7 +300,7 @@
       "firma": "78dc184017b320c2d677dc59ba8ee7e675741250b2a9f17f5e4b9fb2e2223ff4",
       "estado": "fallida",
       "intento": 0,
-      "minuto_envio": 7.1059999999996215,
+      "minuto_envio": 6.786999999998661,
       "minuto_aplicada": null
     },
     {
@@ -311,8 +316,8 @@
       "firma": "7c8e8dcde256e3c0dbfdf87ee68db78d6920d1eafb2a1ec123fbad806246c4ae",
       "estado": "vencida",
       "intento": 1,
-      "minuto_envio": 11.11099999999904,
-      "minuto_aplicada": 14.704
+      "minuto_envio": 10.70199999999866,
+      "minuto_aplicada": 14.298
     }
   ]
 }

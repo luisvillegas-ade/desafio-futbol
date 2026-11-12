@@ -333,7 +333,12 @@ def pagina() -> str:
 <meta name=viewport content='width=device-width,initial-scale=1'>
 <title>monitor — plataforma cautelar</title><style>{CSS}</style></head>
 <body><div class=grid>
-<fieldset style="grid-area:hdr"><legend>estado del sistema</legend><div id=hdr>…</div></fieldset>
+<fieldset style="grid-area:hdr"><legend>estado del sistema</legend>
+<div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+<div id=hdr style="min-width:0;overflow:hidden;text-overflow:ellipsis">…</div>
+<div style="white-space:nowrap"><a href='/'><b>← consola</b></a> ·
+<a href='/transparencia'>transparencia</a> · <a href='/reclamar'>reclamar</a>
+</div></div></fieldset>
 <fieldset style="grid-area:legend"><legend>leyenda</legend><div id=legend>…</div></fieldset>
 <fieldset class=scroll style="grid-area:side"><legend>bitácora · reglas procesales</legend><div id=bitacora>…</div></fieldset>
 <fieldset style="grid-area:center"><legend>orquestación cautelar — circuito en vivo</legend><div id=grafo>…</div></fieldset>

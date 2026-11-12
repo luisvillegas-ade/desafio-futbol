@@ -44,5 +44,7 @@ class Turnos:
                 falta = t["hasta_min"] - ahora
             else:
                 proximos = [x["desde_min"] for x in self.turnos if x["desde_min"] > ahora]
-                falta = (min(proximos) - ahora) if proximos else 1.0
+                if not proximos:
+                    return None, None, None  # pasado el último turno
+                falta = min(proximos) - ahora
             self.reloj.dormir_minutos(max(falta, 0.02))

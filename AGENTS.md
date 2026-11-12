@@ -132,6 +132,15 @@ el pitch). `interactivo` = queda `elevado` hasta que el juez apruebe en la web.
     bloqueo por IP correcto.
 11. El sim corre `avanzar()` cada 0.1 s con lock global; monitor consolidado
     (4 req/ciclo) evita saturar — el polling por orden saturaba el pipeline.
+12. **SIMS ZOMBIE EN EL MISMO PUERTO**: Windows permite que varios simuladores
+    bindeen `0.0.0.0:8080` a la vez y las respuestas se reparten entre ellos.
+    Un sim viejo `finalizado` responde `minuto_actual` ~1700 → `de_turno` da
+    None → los workers esperan firma para siempre → 0 órdenes, `en_ejecucion`
+    muda. Síntoma: 0/7 fases con `ordenes recibidas: 0`. Antes de cada corrida:
+    `netstat -ano | grep ":8080" | grep LISTEN` debe dar UN solo PID.
+    `demo.py` ya detecta puerto ocupado y ofrece frenarlo. Además el motor ahora
+    es resiliente: `esperar_firma_segura` devuelve None pasado el último turno
+    y el worker asienta "sin juez de turno" en vez de colgar.
 12. **Race `expedientes.id` (vie 13, arreglado):** dos workers de tuplas
     distintas podían hacer `COUNT(*)+1` a la vez → mismo id → `UNIQUE
     constraint failed` y la detección se perdía (se recuperaba con la
