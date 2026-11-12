@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS expedientes (
     asn INTEGER,
     tipo_bloqueo_recomendado TEXT,       -- 'ip' | 'dominio'
     estado TEXT,                         -- detectado|elevado|aprobado|en_ejecucion|cerrado|archivado
+    dependencia TEXT DEFAULT 'pericia',  -- pericia|secretaria|juzgado|despacho|archivo
     juez_asignado TEXT,
     creado_min REAL,
     cerrado_min REAL
@@ -110,6 +111,11 @@ def conectar() -> sqlite3.Connection:
                 _conn.execute("PRAGMA table_info(evidencias)")]
         if "promocion" not in cols:
             _conn.execute("ALTER TABLE evidencias ADD COLUMN promocion TEXT")
+        cols_e = [r["name"] for r in
+                  _conn.execute("PRAGMA table_info(expedientes)")]
+        if "dependencia" not in cols_e:
+            _conn.execute("ALTER TABLE expedientes ADD COLUMN dependencia "
+                          "TEXT DEFAULT 'pericia'")
     return _conn
 
 

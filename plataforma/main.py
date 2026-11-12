@@ -84,7 +84,8 @@ def main() -> None:
     if not args.sin_ui:
         from .juez.servidor_ui import ServidorUI
         ServidorUI(reloj, turnos, dispatcher, args.puerto_ui,
-                   modo=args.modo, poller=poller).start()
+                   modo=args.modo, poller=poller, verificador=verificador,
+                   gestor=gestor).start()
         print(f"[main] consola judicial: http://127.0.0.1:{args.puerto_ui} "
               f"(laura/martin, clave demo)")
 

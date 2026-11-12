@@ -28,6 +28,41 @@ class GestorReclamos:
             self._dns_cache[ip] = resp.get("dominios", []) if st == 200 else []
         return self._dns_cache[ip]
 
+    def procesar_ciudadano(self, dominio: str, mensaje: str) -> int:
+        """Reclamo por vía pública: no sabemos qué ISP bloquea el dominio,
+        así que se relevan las 4 listas y se levanta cada orden que lo afecte.
+
+        Devuelve cuántas órdenes se levantaron (0 = desestimado)."""
+        ahora = self.reloj.ahora()
+        n = 0
+        for pid in ("aurora", "andina", "cumbre", "valle"):
+            st, ordenes = self.cliente.get(f"/proveedores/{pid}/ordenes")
+            if st != 200:
+                continue
+            afectantes = [o for o in ordenes if o["estado"] == "aplicada"
+                          and self._afecta(o, dominio)]
+            for orden in afectantes:
+                n += 1
+                rid = f"WEB-{ahora:.3f}-{pid}-{n}"
+                r = {"id": rid, "dominio": dominio, "proveedor": pid,
+                     "mensaje": mensaje, "minuto": ahora}
+                db.ejecutar(
+                    "INSERT OR IGNORE INTO reclamos(id,dominio,proveedor,"
+                    "mensaje,minuto,estado) VALUES(?,?,?,?,?,'recibido')",
+                    (rid, dominio, pid, mensaje, ahora))
+                self._levantar(r, orden)
+        if not n:
+            rid = f"WEB-{ahora:.3f}-des"
+            db.ejecutar(
+                "INSERT OR IGNORE INTO reclamos(id,dominio,proveedor,"
+                "mensaje,minuto,estado) VALUES(?,?,?,?,?,'desestimado')",
+                (rid, dominio, "—", f"{mensaje} (sin medida vigente que lo "
+                    "afecte)", ahora))
+            db.actuacion(None, "reclamo",
+                         f"Reclamo público {rid} por {dominio}: desestimado, "
+                         f"ninguna medida vigente lo afecta", ahora)
+        return n
+
     def procesar(self, r: dict) -> None:
         dominio, pid = r["dominio"], r["proveedor"]
         db.ejecutar(

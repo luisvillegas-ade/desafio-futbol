@@ -69,16 +69,22 @@ def login(error: str = "") -> str:
 <p><input name=usuario placeholder=Usuario autofocus></p>
 <p><input name=password type=password placeholder=Contraseña></p>
 <p><button type=submit style="width:100%">Ingresar</button></p>
-</form><p class=mono>Usuarios demo: laura / martin — clave: demo</p>
+</form><p class=mono style="font-size:12px">Usuarios demo (clave: demo)<br>
+jueces: laura · martin — firman solo de turno<br>
+tramitación: secretario · operador — pases, revisión, informes<br>
+admin — visión completa del sistema</p>
 </div></main>""")
 
 
 def bandeja(expedientes, juez: dict, turno_txt: str, minuto: float) -> str:
+    es_juez = juez.get("rol") == "juez"
     filas = ""
     for e in expedientes:
         est = e["estado"]
+        dep = e["dependencia"] if "dependencia" in e.keys() else "pericia"
+        dep = dep or "pericia"
         botones = ""
-        if est in ("detectado", "elevado"):
+        if es_juez and est in ("detectado", "elevado") and dep == "juzgado":
             botones = (f"<form method=post action='/exp/{_e(e['id'])}/aprobar' style='display:inline'>"
                        f"<button>Aprobar y mandar bloqueo urgente</button></form> "
                        f"<form method=post action='/exp/{_e(e['id'])}/forzar-ip' style='display:inline'>"
@@ -89,23 +95,63 @@ def bandeja(expedientes, juez: dict, turno_txt: str, minuto: float) -> str:
                   f"<span class=mono>fase {e['fase_n']}</span></td>"
                   f"<td class=mono>{_e(e['host_stream'])}<br>{_e(e['ip_servidor'])}</td>"
                   f"<td>{_e(e['tipo_bloqueo_recomendado'] or '')}</td>"
-                  f"<td><span class='badge b-{est}'>{est}</span></td>"
+                  f"<td><span class='badge b-{est}'>{est}</span><br>"
+                  f"<span class=mono style='font-size:11px;color:#94a3b8'>{_e(dep)}</span></td>"
                   f"<td class=mono>{e['creado_min']:.1f}</td><td>{botones}</td></tr>")
     if not filas:
         filas = "<tr><td colspan=6>Sin expedientes todavía.</td></tr>"
+    rol_txt = juez.get("rol", "")
     return pagina("Bandeja del juez", header(
         "Consola Judicial — Bandeja de expedientes",
-        f"{_e(juez['nombre'])} · <a href='/monitor'>Monitor</a> · "
+        f"{_e(juez['nombre'])} ({_e(rol_txt)}) · <a href='/monitor'>Monitor</a> · "
         f"<a href='/transparencia'>Transparencia</a> · "
         f"<a href='/salir'>Salir</a>") + f"""
 <main>
 <div class=peritaje>Minuto de partido <b>{minuto:.1f}</b> · { _e(turno_txt) }</div>
 <table><tr><th>Expediente</th><th>Stream</th><th>Medida sugerida</th>
-<th>Estado</th><th>Min</th><th></th></tr>{filas}</table>
+<th>Estado / dependencia</th><th>Min</th><th></th></tr>{filas}</table>
 </main>""")
 
 
-def detalle(exp, evidencias, actuaciones, ordenes) -> str:
+def _acciones(exp: dict, sesion: dict) -> str:
+    """Barra de movimientos según rol y dependencia del expediente."""
+    dep = exp.get("dependencia") or "pericia"
+    rol = sesion.get("rol")
+    eid = _e(exp["id"])
+
+    def btn(accion, txt, cls=""):
+        return (f"<form method=post action='/exp/{eid}/{accion}' "
+                f"style='display:inline'><button class='{cls}'>{txt}</button></form>")
+
+    out = []
+    if rol in ("operador", "secretario", "admin"):
+        if dep == "pericia":
+            out.append(btn("pase-secretaria", "Pasar a Secretaría"))
+            out.append(btn("pase-juzgado", "Elevar a firma (Juzgado)"))
+        elif dep == "secretaria":
+            out.append(btn("pase-juzgado", "Elevar a firma (Juzgado)"))
+            out.append(btn("pase-pericia", "Devolver a Pericia", "sec"))
+        elif dep == "juzgado":
+            out.append(btn("pase-secretaria", "Devolver a Secretaría", "sec"))
+        elif dep == "despacho":
+            out.append("<span class=mono>medida en ejecución</span>")
+    if rol == "juez":
+        if dep == "juzgado" and exp["estado"] in ("detectado", "elevado"):
+            out.append(btn("aprobar", "Aprobar y librar cautelar"))
+            out.append(btn("forzar-ip", "Aprobar forzando IP", "sec"))
+            out.append(btn("rechazar", "Rechazar", "peligro"))
+        out.append(btn("pase-secretaria", "Devolver a Secretaría", "sec"))
+    if rol in ("operador", "secretario", "juez", "admin"):
+        out.append(btn("revision", "Iniciar revisión (re-peritaje)", "sec"))
+    if rol in ("operador", "secretario", "juez", "admin") and dep == "despacho":
+        out.append(btn("archivar", "Archivar definitivamente", "peligro"))
+    out.append(f"<a href='/exp/{eid}/informe'><button type=button class=sec>"
+               f"Emitir informe</button></a>")
+    return " ".join(out)
+
+
+def detalle(exp, evidencias, actuaciones, ordenes, reclamos_rows=(),
+            sesion=None) -> str:
     def _promo(ev):
         canales = json.loads(ev["promocion"] or "[]")
         if not canales:
@@ -126,15 +172,20 @@ def detalle(exp, evidencias, actuaciones, ordenes) -> str:
         f"<td>{_e(o['tipo'])} → {_e(o['objetivo'])}</td>"
         f"<td><span class='badge b-{_e(o['estado'])}'>{_e(o['estado'])}</span></td>"
         f"<td class=mono>{_e(o['juez_id'])}</td></tr>" for o in ordenes)
+    rec = reclamos(reclamos_rows) if reclamos_rows else ""
+    dep = exp.get("dependencia") or "pericia"
     return pagina(f"Expediente {exp['id']}", header(
         f"{_e(exp['id'])} — «{_e(exp['stream_id'])}» s/ medida cautelar (fase {exp['fase_n']})",
         "<a href='/'>← Bandeja</a>") + f"""
 <main>
 <div class=card><b>Stream:</b> <span class=mono>{_e(exp['host_stream'])} · {_e(exp['ip_servidor'])} · ASN {_e(exp['asn'])}</span><br>
-<b>Medida sugerida:</b> {_e(exp['tipo_bloqueo_recomendado'])} · <b>Estado:</b> {_e(exp['estado'])}</div>
+<b>Medida sugerida:</b> {_e(exp['tipo_bloqueo_recomendado'])} · <b>Estado:</b> {_e(exp['estado'])} ·
+<b>Dependencia:</b> <span class='badge b-detectado'>{_e(dep)}</span></div>
+<div class=card>{_acciones(exp, sesion or {})}</div>
 <h3>Peritaje técnico</h3>{ev}
 <h3>Órdenes libradas</h3>
 <table><tr><th>Orden</th><th>Proveedor</th><th>Objetivo</th><th>Estado</th><th>Juez</th></tr>{ords}</table>
+{rec}
 <h3>Actuaciones — cadena de custodia (fojas)</h3>
 <table><tr><th>Foja</th><th>Tipo</th><th>Detalle</th><th>Min</th><th>Hash</th></tr>{acts}</table>
 </main>""")
@@ -172,3 +223,109 @@ def reclamos(reclamos_rows) -> str:
 
 def dumps_pretty(obj) -> str:
     return html.escape(json.dumps(obj, ensure_ascii=False, indent=2))
+
+
+CSS_INFORME = """
+body{font-family:Georgia,'Times New Roman',serif;color:#111;background:#fff;
+margin:0;padding:32px;max-width:820px;margin:auto;font-size:13px;line-height:1.5}
+h1{font-size:17px;text-align:center;margin:0}
+h2{font-size:14px;margin:22px 0 6px}
+.caratula{text-align:center;margin-bottom:18px}
+.caratula p{margin:2px 0;font-size:12px;color:#333}
+table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+td,th{border:1px solid #999;padding:4px 8px;text-align:left}
+.mono{font-family:Consolas,monospace;font-size:11px}
+.firma{margin-top:60px;display:flex;justify-content:space-around}
+.firma div{text-align:center;border-top:1px solid #111;padding-top:6px;width:40%}
+.nota{font-size:11px;color:#444;margin-top:24px}
+@media print{.noprint{display:none}}
+"""
+
+
+def informe(exp, evidencias, actuaciones, ordenes, reclamos_rows) -> str:
+    """Informe judicial imprimible del expediente (Ctrl+P → PDF)."""
+    ev = "".join(
+        f"<tr><td class=mono>{_e(x['deteccion_id'])}</td>"
+        f"<td class=mono>{x['minuto']:.2f}</td>"
+        f"<td class=mono>{_e(x['marca_extraida'])}</td>"
+        f"<td class=mono>{_e(x['captura_sha256'][:24])}…</td></tr>"
+        for x in evidencias)
+    acts = "".join(
+        f"<tr><td class=mono>F°{a['n']}</td><td>{_e(a['tipo'])}</td>"
+        f"<td>{_e(a['detalle'])}</td><td class=mono>{a['minuto']:.2f}</td>"
+        f"<td class=mono>{_e(a['hash_actual'][:16])}…</td></tr>"
+        for a in actuaciones)
+    ords = "".join(
+        f"<tr><td class=mono>{_e(o['orden_id'])}</td><td>{_e(o['proveedor_id'])}</td>"
+        f"<td>{_e(o['tipo'])}</td><td class=mono>{_e(o['objetivo'])}</td>"
+        f"<td>{_e(o['estado'])}</td><td class=mono>{_e(o['juez_id'])}</td>"
+        f"<td class=mono>{o['vence_min']}</td></tr>" for o in ordenes)
+    recs = "".join(
+        f"<tr><td class=mono>{_e(r['id'])}</td><td class=mono>{_e(r['dominio'])}</td>"
+        f"<td>{_e(r['proveedor'])}</td><td>{_e(r['estado'])}</td></tr>"
+        for r in reclamos_rows) or "<tr><td colspan=4>Sin reclamos.</td></tr>"
+    dep = exp.get("dependencia") or "pericia"
+    return (f"<!doctype html><html lang=es><head><meta charset=utf-8>"
+            f"<title>Informe {_e(exp['id'])}</title><style>{CSS_INFORME}</style>"
+            f"</head><body>"
+            f"<p class=noprint><a href='/exp/{_e(exp['id'])}'>← volver</a> · "
+            f"Ctrl+P para imprimir / guardar PDF</p>"
+            f"<div class=caratula>"
+            f"<h1>INFORME DE EXPEDIENTE ELECTRÓNICO</h1>"
+            f"<p><b>{_e(exp['id'])}</b> — «{_e(exp['stream_id'])}» s/ MEDIDA "
+            f"CAUTELAR URGENTE (fase {exp['fase_n']})</p>"
+            f"<p>Plataforma Federal de Órdenes de Bloqueo en Vivo · "
+            f"dependencia actual: {_e(dep)} · estado: {_e(exp['estado'])}</p></div>"
+            f"<h2>I. Objeto de la medida</h2>"
+            f"<p>Stream infractor: <span class=mono>{_e(exp['host_stream'])} · "
+            f"{_e(exp['ip_servidor'])} · ASN {_e(exp['asn'])}</span><br>"
+            f"Medida sugerida por el peritaje: <b>{_e(exp['tipo_bloqueo_recomendado'])}</b></p>"
+            f"<h2>II. Peritaje técnico (evidencia)</h2>"
+            f"<table><tr><th>Detección</th><th>Min</th><th>Marca de agua</th>"
+            f"<th>SHA-256 captura</th></tr>{ev}</table>"
+            f"<h2>III. Medidas libradas</h2>"
+            f"<table><tr><th>Orden</th><th>Proveedor</th><th>Tipo</th>"
+            f"<th>Objetivo</th><th>Estado</th><th>Juez</th><th>Vence</th></tr>"
+            f"{ords}</table>"
+            f"<h2>IV. Reclamos de terceros</h2>"
+            f"<table><tr><th>ID</th><th>Dominio</th><th>Proveedor</th>"
+            f"<th>Estado</th></tr>{recs}</table>"
+            f"<h2>V. Actuaciones (cadena de custodia)</h2>"
+            f"<table><tr><th>Foja</th><th>Tipo</th><th>Detalle</th><th>Min</th>"
+            f"<th>Hash</th></tr>{acts}</table>"
+            f"<div class=firma><div>Funcionario/a</div><div>Juez/a</div></div>"
+            f"<p class=nota>Verificable: cada actuación encadena "
+            f"sha256(hash_prev|tipo|detalle|minuto) con la anterior. "
+            f"Recomputar: python -m plataforma.auditoria.verificar_cadena.</p>"
+            f"</body></html>")
+
+
+def reclamar(exito=None, error="") -> str:
+    """Formulario público de reclamo (procedimiento sumario digital)."""
+    aviso = ""
+    if exito is not None:
+        if exito:
+            aviso = (f"<div class=card style='border-color:#15803d'>"
+                     f"<b>Reclamo recibido.</b> Se localizaron y elevaron "
+                     f"<b>{exito}</b> medida(s) que afectaban el dominio. "
+                     f"El levantamiento firmado se ejecuta en minutos — seguilo "
+                     f"en <a href='/transparencia'>transparencia</a> o "
+                     f"<a href='/monitor'>monitor</a>.</div>")
+        else:
+            aviso = ("<div class=card><b>Reclamo registrado y desestimado:</b> "
+                     "ninguna medida cautelar vigente afecta ese dominio.</div>")
+    err = f"<div class=aviso>{_e(error)}</div>" if error else ""
+    return pagina("Reclamo digital de sitio afectado", header(
+        "Reclamo digital — sitio afectado por medida cautelar",
+        "<a href='/transparencia'>Transparencia</a> · <a href='/monitor'>Monitor</a>") + f"""
+<main><div class=card style="max-width:560px;margin:40px auto">
+<h2>Procedimiento sumario de reclamos</h2>
+<p class=mono style="font-size:13px">Si su sitio fue afectado por una medida
+cautelar de bloqueo, presente aquí el dominio. La plataforma lo eleva al juez
+de turno y ordena el levantamiento y su reemplazo por una medida más precisa.</p>
+{err}{aviso}
+<form method=post action=/reclamar>
+<p><input name=dominio placeholder="midominio.test" required></p>
+<p><input name=mensaje placeholder="Motivo (ej: mi tienda no carga desde hace 10 min)"></p>
+<p><button type=submit>Presentar reclamo</button></p>
+</form></div></main>""")

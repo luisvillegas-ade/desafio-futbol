@@ -24,10 +24,10 @@ def obtener_o_crear(det: dict, tipo_rec: str):
                      (stream_id,))["c"] + 1
         db.ejecutar(
             "INSERT INTO expedientes(id,stream_id,fase_n,host_stream,ip_servidor,"
-            "asn,tipo_bloqueo_recomendado,estado,creado_min) "
-            "VALUES(?,?,?,?,?,?,?,?,?)",
+            "asn,tipo_bloqueo_recomendado,estado,dependencia,creado_min) "
+            "VALUES(?,?,?,?,?,?,?,?,?,?)",
             (exp_id, stream_id, fase, det["host_stream"], det["ip_servidor"],
-             det.get("asn"), tipo_rec, "detectado", det["minuto"]))
+             det.get("asn"), tipo_rec, "detectado", "pericia", det["minuto"]))
         return dict(db.q1("SELECT * FROM expedientes WHERE id=?", (exp_id,))), True
 
 
@@ -47,8 +47,28 @@ def agregar_evidencia(exp_id: str, det: dict, dominios_dns, riesgo: bool,
          1 if riesgo else 0))
 
 
+_DEP_POR_ESTADO = {"elevado": "juzgado", "en_ejecucion": "despacho",
+                   "archivado": "archivo"}
+
+
 def set_estado(exp_id: str, estado: str) -> None:
-    db.ejecutar("UPDATE expedientes SET estado=? WHERE id=?", (estado, exp_id))
+    dep = _DEP_POR_ESTADO.get(estado)
+    if dep:
+        db.ejecutar("UPDATE expedientes SET estado=?, dependencia=? WHERE id=?",
+                    (estado, dep, exp_id))
+    else:
+        db.ejecutar("UPDATE expedientes SET estado=? WHERE id=?",
+                    (estado, exp_id))
+
+
+def pase(exp_id: str, dependencia: str, actor: str, minuto: float) -> None:
+    """Traslada el expediente a otra dependencia (mesa de pases)."""
+    prev = db.q1("SELECT dependencia FROM expedientes WHERE id=?", (exp_id,))
+    db.ejecutar("UPDATE expedientes SET dependencia=? WHERE id=?",
+                (dependencia, exp_id))
+    db.actuacion(exp_id, "pase",
+                 f"Pase {prev['dependencia'] if prev else '?'} -> {dependencia} "
+                 f"por {actor}", minuto)
 
 
 def tiene_ordenes_activas(exp_id: str) -> bool:

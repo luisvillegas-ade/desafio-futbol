@@ -26,8 +26,19 @@ MARGEN_TURNO_MIN = 0.6     # no se firma a menos de este margen del fin del turn
 TIMEOUT_HTTP = 5.0
 INTENTOS_MAX = 25          # tope de reenvíos por proveedor (Cumbre falla ~35%)
 
-# Usuarios de demostración del juez (las bases permiten usuarios/claves demo).
-USUARIOS_JUEZ = {
-    "laura":  {"password": "demo", "juez_id": "jueza-laura-ficticia"},
-    "martin": {"password": "demo", "juez_id": "juez-martin-ejemplo"},
+# Usuarios de demostración (las bases permiten usuarios/claves demo).
+# rol=juez: firma cautelares (solo de turno). secretario/operador: tramitación
+# y pases del expediente, sin firma. admin: visión completa + tramitación,
+# nunca firma. rol=publico (sin login): /transparencia, /reclamar y /monitor.
+USUARIOS = {
+    "laura":      {"password": "demo", "rol": "juez",
+                   "juez_id": "jueza-laura-ficticia"},
+    "martin":     {"password": "demo", "rol": "juez",
+                   "juez_id": "juez-martin-ejemplo"},
+    "secretario": {"password": "demo", "rol": "secretario",
+                   "nombre": "Secretaría Ejemplo"},
+    "operador":   {"password": "demo", "rol": "operador",
+                   "nombre": "Operador Fiscalía"},
+    "admin":      {"password": "demo", "rol": "admin",
+                   "nombre": "Administración"},
 }

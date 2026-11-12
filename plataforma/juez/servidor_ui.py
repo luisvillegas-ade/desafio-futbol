@@ -9,6 +9,15 @@ Rutas:
   POST /exp/<id>/rechazar                       — archivar
   GET  /transparencia                           — público, sin login
   GET  /monitor, /monitor/datos                 — monitor en vivo (público)
+  GET|POST /reclamar                            — reclamo digital público
+  POST /exp/<id>/pase-<dep>                     — movimiento entre dependencias
+  POST /exp/<id>/revision                       — re-peritaje (iniciar revisión)
+  POST /exp/<id>/archivar                       — archivo definitivo (juez)
+  GET  /exp/<id>/informe                        — informe imprimible
+
+Roles (config.USUARIOS): juez (firma solo de turno), secretario y operador
+(pases, revisión, informes; sin firma). Público: transparencia, monitor,
+reclamar.
 """
 import secrets
 import threading
@@ -25,7 +34,8 @@ SESIONES = {}  # sid -> juez dict {"id","nombre"}
 
 class ServidorUI(threading.Thread):
     def __init__(self, reloj, turnos, dispatcher, puerto: int,
-                 modo: str = "auto", poller=None):
+                 modo: str = "auto", poller=None, verificador=None,
+                 gestor=None):
         super().__init__(daemon=True, name="Thread-WebUI")
         self.reloj = reloj
         self.turnos = turnos
@@ -33,6 +43,8 @@ class ServidorUI(threading.Thread):
         self.puerto = puerto
         self.modo = modo
         self.poller = poller
+        self.verificador = verificador
+        self.gestor = gestor
         self.httpd = None
 
     def run(self) -> None:
@@ -88,6 +100,8 @@ class ServidorUI(threading.Thread):
                 if partes == ["monitor", "datos"]:
                     return self._json(M.datos_json(ui.reloj, ui.turnos,
                                                    ui.modo, ui.poller))
+                if partes == ["reclamar"]:
+                    return self._html(T.reclamar())
                 sesion = self._sesion()
                 if not sesion:
                     return self._redirect("/login")
@@ -105,8 +119,25 @@ class ServidorUI(threading.Thread):
                     ev = db.q("SELECT * FROM evidencias WHERE expediente_id=?", (exp["id"],))
                     ac = db.q("SELECT * FROM actuaciones WHERE expediente_id=? ORDER BY n", (exp["id"],))
                     oc = db.q("SELECT * FROM ordenes WHERE expediente_id=?", (exp["id"],))
-                    return self._html(T.detalle(dict(exp), ev, ac, oc))
+                    return self._html(T.detalle(dict(exp), ev, ac, oc,
+                                                self._reclamos_de(exp["id"]),
+                                                sesion))
+                if len(partes) == 3 and partes[0] == "exp" and partes[2] == "informe":
+                    exp = db.q1("SELECT * FROM expedientes WHERE id=?", (partes[1],))
+                    if not exp:
+                        return self._html(T.pagina("404", "No existe"), 404)
+                    ev = db.q("SELECT * FROM evidencias WHERE expediente_id=?", (exp["id"],))
+                    ac = db.q("SELECT * FROM actuaciones WHERE expediente_id=? ORDER BY n", (exp["id"],))
+                    oc = db.q("SELECT * FROM ordenes WHERE expediente_id=?", (exp["id"],))
+                    return self._html(T.informe(dict(exp), ev, ac, oc,
+                                                self._reclamos_de(exp["id"])))
                 self._html(T.pagina("404", "No existe"), 404)
+
+            def _reclamos_de(self, exp_id):
+                return db.q(
+                    "SELECT r.* FROM reclamos r JOIN ordenes o "
+                    "ON o.orden_id=r.orden_id WHERE o.expediente_id=? "
+                    "ORDER BY r.minuto", (exp_id,))
 
             # -- rutas POST --------------------------------------------------
             def do_POST(self):
@@ -116,12 +147,15 @@ class ServidorUI(threading.Thread):
                 if partes == ["login"]:
                     u = cuerpo.get("usuario", [""])[0]
                     p = cuerpo.get("password", [""])[0]
-                    datos = config.USUARIOS_JUEZ.get(u)
+                    datos = config.USUARIOS.get(u)
                     if not datos or datos["password"] != p:
                         return self._html(T.login("Usuario o contraseña incorrectos"), 403)
-                    juez = ui.turnos.jueces.get(datos["juez_id"])
-                    sesion = {"juez_id": datos["juez_id"],
-                              "nombre": juez[1]["nombre"] if juez else datos["juez_id"]}
+                    juez = ui.turnos.jueces.get(datos.get("juez_id")) \
+                        if datos.get("juez_id") else None
+                    sesion = {"juez_id": datos.get("juez_id"),
+                              "rol": datos["rol"],
+                              "nombre": juez[1]["nombre"] if juez
+                                        else datos.get("nombre", u)}
                     sid = secrets.token_hex(16)
                     SESIONES[sid] = sesion
                     self.send_response(303)
@@ -129,6 +163,17 @@ class ServidorUI(threading.Thread):
                     self.send_header("Set-Cookie", f"sid={sid}; Path=/; HttpOnly")
                     self.end_headers()
                     return
+                if partes == ["reclamar"]:
+                    dominio = cuerpo.get("dominio", [""])[0].strip()
+                    mensaje = cuerpo.get("mensaje", [""])[0].strip()
+                    if not dominio or "." not in dominio:
+                        return self._html(T.reclamar(
+                            error="Ingrese un dominio válido."), 400)
+                    if not ui.gestor:
+                        return self._html(T.reclamar(
+                            error="El módulo de reclamos no está activo."), 503)
+                    n = ui.gestor.procesar_ciudadano(dominio, mensaje)
+                    return self._html(T.reclamar(exito=n))
                 sesion = self._sesion()
                 if not sesion:
                     return self._redirect("/login")
@@ -143,13 +188,46 @@ class ServidorUI(threading.Thread):
                     return self._redirect("/")
                 ahora = ui.reloj.ahora()
                 t, jz, j = ui.turnos.de_turno(ahora)
+                rol = sesion.get("rol")
+                actor = sesion.get("nombre", "?")
+
+                if accion.startswith("pase-"):
+                    if rol not in ("operador", "secretario", "juez", "admin"):
+                        return self._redirect(f"/exp/{exp_id}")
+                    dep = accion[5:]
+                    if dep not in ("pericia", "secretaria", "juzgado",
+                                   "despacho", "archivo"):
+                        return self._redirect(f"/exp/{exp_id}")
+                    ex.pase(exp_id, dep, actor, ahora)
+                    return self._redirect(f"/exp/{exp_id}")
+                if accion == "archivar":
+                    if rol not in ("juez", "secretario", "admin"):
+                        return self._redirect(f"/exp/{exp_id}")
+                    ex.set_estado(exp_id, "archivado")
+                    db.actuacion(exp_id, "dictamen",
+                                 f"Expediente archivado por {actor}", ahora)
+                    return self._redirect(f"/exp/{exp_id}")
+                if accion == "revision":
+                    if rol not in ("operador", "secretario", "juez", "admin"):
+                        return self._redirect(f"/exp/{exp_id}")
+                    return self._revision(exp, actor, ahora)
+
                 if accion == "rechazar":
+                    if rol != "juez":
+                        return self._redirect(f"/exp/{exp_id}")
+                    if not t or t["juez_id"] != sesion["juez_id"]:
+                        db.actuacion(exp_id, "dictamen",
+                                     f"Intento de firma de {sesion['juez_id']} "
+                                     f"rechazado: no está de turno", ahora)
+                        return self._redirect(f"/exp/{exp_id}")
                     ex.set_estado(exp_id, "archivado")
                     db.actuacion(exp_id, "dictamen",
                                  f"Orden rechazada por {sesion['juez_id']} — "
                                  f"expediente archivado", ahora)
                     return self._redirect(f"/exp/{exp_id}")
                 if accion in ("aprobar", "forzar-ip"):
+                    if rol != "juez":
+                        return self._redirect(f"/exp/{exp_id}")
                     if not t or t["juez_id"] != sesion["juez_id"]:
                         db.actuacion(exp_id, "dictamen",
                                      f"Intento de firma de {sesion['juez_id']} "
@@ -169,6 +247,33 @@ class ServidorUI(threading.Thread):
                     ui.dispatcher.despachar_expediente(dict(exp))
                     return self._redirect(f"/exp/{exp_id}")
                 self._html(T.pagina("404", "No existe"), 404)
+
+            def _revision(self, exp, actor, ahora):
+                """Re-peritaje: re-consulta DNS pasivo y re-clasifica la medida."""
+                exp_id = exp["id"]
+                ex.pase(exp_id, "pericia", actor, ahora)
+                det = {"id": f"REV-{ahora:.2f}", "host_stream": exp["host_stream"],
+                       "ip_servidor": exp["ip_servidor"], "asn": exp["asn"],
+                       "minuto": ahora,
+                       "marca_de_agua_extraida": "", "captura": {}}
+                tipo, objetivo, dominios, ajenos = \
+                    ui.verificador.analizar_colateral(det)
+                riesgo = (f"{len(ajenos)} dominio(s) ajeno(s) en la IP"
+                          if ajenos else "IP dedicada, sin riesgo colateral")
+                db.actuacion(
+                    exp_id, "revision",
+                    f"Revisión ordenada por {actor}: re-peritaje de "
+                    f"{exp['ip_servidor']} — {riesgo}. Medida recalculada: "
+                    f"{tipo} -> {objetivo}", ahora)
+                if tipo != exp["tipo_bloqueo_recomendado"]:
+                    db.ejecutar(
+                        "UPDATE expedientes SET tipo_bloqueo_recomendado=? "
+                        "WHERE id=?", (tipo, exp_id))
+                    db.actuacion(
+                        exp_id, "revision",
+                        f"La medida sugerida cambia: "
+                        f"{exp['tipo_bloqueo_recomendado']} -> {tipo}", ahora)
+                return self._redirect(f"/exp/{exp_id}")
 
         self.httpd = ThreadingHTTPServer(("127.0.0.1", self.puerto), H)
         self.httpd.serve_forever()

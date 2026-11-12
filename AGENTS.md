@@ -17,7 +17,9 @@ ya descubiertas. Leer esto ANTES de tocar código.
 | Reintentos Cumbre (35 % falla) | ✅ re-firma con juez de turno vigente |
 | Buffer de cambio de turno (min 50) | ✅ verificado con `--inicio-min 45` |
 | Reclamos (levantar + reemplazo por dominio) | ✅ verificado end-to-end |
-| UI juez (login, bandeja, aprobar/forzar-ip/rechazar, /transparencia) | ✅ funcional, estética mínima |
+| UI por roles (juez/secretario/operador/admin) + pases + revisión + informe | ✅ verificado en vivo |
+| Portal público: /transparencia + /reclamar + /monitor TUI | ✅ funcional |
+| Verificador de cadena de custodia (`auditoria/verificar_cadena.py`) | ✅ detecta tampering |
 | Cadena de custodia (hash encadenado) + exportador | ✅ `entrega/*.json` regenerados de corrida 7/7 |
 | `entrega/propuesta-normativa.md` | ✅ borrador escrito (1 página, 5 puntos) |
 | Race condition `expedientes.id` entre workers | ✅ fix: `db.bloqueo()` en `obtener_o_crear` |
@@ -37,7 +39,9 @@ python simulador/servidor.py --escenario datos/escenario_practica.json --acelera
 # Terminal 2 — plataforma (desde la carpeta desafio-futbol/)
 python -m plataforma.main --modo auto --reset          # auto-firma (orden marco)
 python -m plataforma.main --modo interactivo --reset   # el juez aprueba en la web
-# Consola judicial: http://127.0.0.1:8090  (usuarios: laura / martin, clave: demo)
+# Consola judicial: http://127.0.0.1:8090 — clave 'demo' para todos:
+#   jueces laura/martin (firman solo de turno), secretario, operador, admin.
+# Público: /transparencia, /reclamar, /monitor
 
 # Terminal 3 — cuando el sim llega a fin_min + 5 de gracia:
 python evaluacion/verificar.py --log salida/registro.jsonl
@@ -60,10 +64,13 @@ Es la forma de DEMOSTRAR reclamos en el video: jugando perfecto el sim
 
 ```
 main.py                Orquestador + hilos. Flags: --modo/--servidor/--reset/--sin-ui/--exportar
-config.py              Constantes. SERVIDOR default http://127.0.0.1:8080
+config.py              Constantes + usuarios demo por rol (juez laura/martin,
+                       secretario, operador, admin — clave 'demo'). SERVIDOR
+                       default http://127.0.0.1:8080
 cliente_sim.py         Cliente HTTP (urllib). Fuerza localhost→127.0.0.1 (ver quirks)
 db.py                  SQLite única + lock global + WAL + synchronous=OFF.
                        actuacion(): append-only con hash encadenado por expediente.
+                       expedientes.dependencia: circuito pericia→secretaria→juzgado→despacho→archivo
 motor/reloj.py         Cachea /estado y extrapola el minuto entre polls (usa `acelerar`).
 motor/turnos.py        esperar_firma_segura(): si falta < MARGEN_TURNO_MIN (0.6)
                        para el fin del turno, duerme hasta el borde y devuelve
@@ -79,9 +86,13 @@ motor/dispatcher.py    Worker por (expediente, proveedor): firma → POST →
                        (lista completa por proveedor), no uno por orden.
 motor/reclamos.py      Ubica la orden aplicada que afecta el dominio reclamado,
                        la levanta firmada y despacha reemplazo por dominio.
-juez/servidor_ui.py    ThreadingHTTPServer: login (cookie), bandeja, detalle,
-                       aprobar/forzar-ip/rechazar, /transparencia público.
-juez/templates.py      HTML server-side (dark, autorefresh 4 s).
+juez/servidor_ui.py    ThreadingHTTPServer: login por roles (cookie), bandeja
+                       con dependencia, detalle con acciones por rol (aprobar/
+                       forzar-ip/rechazar/pase/revision/archivar), informe
+                       imprimible /exp/<id>/informe. Público: /transparencia,
+                       /reclamar, /monitor (+/monitor/datos JSON live).
+juez/templates.py      HTML server-side (dark, autorefresh 4 s) + informe judicial.
+juez/monitor.py        Tablero TUI bento en vivo (grafo orquestador→agentes→ISPs).
 auditoria/exportar.py  entrega/expediente-ejemplo.json + registro-auditoria.json
 datos_app/plataforma.db  SSOT (se crea sola; --reset la borra)
 ```

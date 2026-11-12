@@ -36,8 +36,14 @@ python -m plataforma.main --modo auto --reset          # auto-firma (orden marco
 python -m plataforma.main --modo interactivo --reset   # el juez aprueba cada orden en la web
 python -m plataforma.main --modo auto --reset --servidor http://<ip>:8080   # partido final
 
-# Consola judicial: http://127.0.0.1:8090  (usuarios: laura / martin, clave: demo)
-# Portal público de transparencia: http://127.0.0.1:8090/transparencia
+# Consola judicial: http://127.0.0.1:8090  (clave demo para todos)
+#   Jueces:     laura / martin   (firman solo estando de turno)
+#   Secretaría: secretario       (pases, devolución a pericia, archivo)
+#   Fiscalía:   operador         (pases, revisión, informes)
+#   Admin:      admin            (visión completa del sistema)
+# Monitor en vivo:  http://127.0.0.1:8090/monitor        (público)
+# Transparencia:    http://127.0.0.1:8090/transparencia  (público)
+# Reclamos web:     http://127.0.0.1:8090/reclamar       (público)
 
 # Terminal 3 — cuando el partido termina (+5 min de gracia)
 python evaluacion/verificar.py --log salida/registro.jsonl
@@ -58,7 +64,7 @@ Flags útiles del simulador: `--acelerar 60` (partido en ~2 min para iterar) · 
 4. **Firma judicial con turnos** (`motor/turnos.py`): si falta menos de ~0.6 min para el fin del turno (cambio en el minuto 50), la firma espera al borde y la orden sale firmada por el juez entrante — cero órdenes fuera de turno.
 5. **Despacho paralelo y reintentos** (`motor/dispatcher.py`): un worker por `(expediente, proveedor)`; monitor consolidado (4 consultas por ciclo, no una por orden). FibraValle solo acepta `dominio` — se traduce la orden para ese proveedor. Las fallas de Cumbre (~35 %) se reintentan con `orden_id` nuevo (`ord-<exp>-<prov>-r<n>`) y firma recalculada.
 6. **Reclamos** (`motor/reclamos.py`): polling de `/reclamos`; ubica la orden activa que afecta al dominio reclamado, la levanta con firma judicial y despacha un reemplazo por `dominio` más preciso.
-7. **Consola judicial** (`juez/`): login, bandeja con pre-dictamen pericial automático, aprobar / forzar-IP / rechazar, y `/transparencia` público. En `--modo auto` la firma es inmediata (orden marco: la narrativa de nuestra propuesta normativa).
+7. **Consola judicial por roles** (`juez/`): el expediente circula por dependencias `pericia → secretaría → juzgado → despacho → archivo` y cada pase queda asentado como actuación `pase` en la cadena de custodia. El juez firma solo estando de turno; secretaría y fiscalía hacen pases, devuelven a revisión técnica y archivan; el admin ve todo. Botones: aprobar / forzar-IP / rechazar / **iniciar revisión** (re-peritaje en vivo) / archivar / **emitir informe** imprimible (`/exp/<id>/informe`). Superficies públicas: `/transparencia`, `/reclamar` (procedimiento sumario digital) y `/monitor` (tablero TUI en vivo). En `--modo auto` la firma es inmediata (orden marco: la narrativa de nuestra propuesta normativa).
 
 ### Resultados en el escenario de práctica
 
