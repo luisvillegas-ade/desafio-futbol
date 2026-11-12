@@ -11,9 +11,9 @@
     "dependencia": "archivo",
     "juez_asignado": "jueza-laura-ficticia",
     "creado_min": 9.0,
-    "cerrado_min": 110.015,
+    "cerrado_min": 110.05469999999987,
     "aprobada_por": "jueza-laura-ficticia",
-    "aprobada_min": 21.144999999999417
+    "aprobada_min": 20.066200000000535
   },
   "evidencias": [
     {
@@ -179,268 +179,268 @@
   ],
   "actuaciones": [
     {
-      "id": 19,
+      "id": 26,
       "expediente_id": "EXP-2026-000003",
       "n": 1,
       "tipo": "evidencia",
       "detalle": "Evidencia D-0004 acreditada y custodiada: captura mpegts 6 s (sha256 3dad22a73983a0668498…), huella 01c79c4ae254085124af3d49",
       "minuto": 9.0,
-      "timestamp_iso": "2026-11-12T19:13:06",
+      "timestamp_iso": "2026-11-12T19:27:10",
       "hash_prev": "GENESIS",
-      "hash_actual": "d737bd44c906ef2d8ddc6d610d4a65fe56cd5a86f3b635eb6790963fdab6af92"
+      "hash_actual": "c23cb78777588380b77a75d39c0c0a89c611ae8779965f7c0fd5b201feed960c"
     },
     {
-      "id": 20,
+      "id": 27,
       "expediente_id": "EXP-2026-000003",
       "n": 2,
       "tipo": "deteccion",
       "detalle": "D-0004 — señal oficial pirata en tv.verpartido-hd.test (192.0.2.50, ASN 64620), marca LP26-PRA-OFI-S010457",
       "minuto": 9.0,
-      "timestamp_iso": "2026-11-12T19:13:06",
-      "hash_prev": "d737bd44c906ef2d8ddc6d610d4a65fe56cd5a86f3b635eb6790963fdab6af92",
-      "hash_actual": "fc1ca284d8c3fa5e8892b715543e016543fbe3bd2f9bd85dbe46a52e609831c1"
+      "timestamp_iso": "2026-11-12T19:27:10",
+      "hash_prev": "c23cb78777588380b77a75d39c0c0a89c611ae8779965f7c0fd5b201feed960c",
+      "hash_actual": "9f1bd36ac2ed853fc783708e755533a15899265c346d4ef058e952a54894e22c"
     },
     {
-      "id": 21,
+      "id": 28,
       "expediente_id": "EXP-2026-000003",
       "n": 3,
       "tipo": "peritaje",
       "detalle": "Riesgo colateral: 4 dominio(s) ajeno(s) en la IP. Medida sugerida: bloqueo por dominio -> tv.verpartido-hd.test hasta min 105",
       "minuto": 9.0,
-      "timestamp_iso": "2026-11-12T19:13:06",
-      "hash_prev": "fc1ca284d8c3fa5e8892b715543e016543fbe3bd2f9bd85dbe46a52e609831c1",
-      "hash_actual": "f54479d73082011a42513af0d3aa6ad4eab65f5ce9329067f7a81924404bfa3c"
-    },
-    {
-      "id": 24,
-      "expediente_id": "EXP-2026-000003",
-      "n": 4,
-      "tipo": "dictamen",
-      "detalle": "Orden cautelar aprobada por jueza-laura-ficticia (forzando IP)",
-      "minuto": 9.355,
-      "timestamp_iso": "2026-11-12T19:13:06",
-      "hash_prev": "f54479d73082011a42513af0d3aa6ad4eab65f5ce9329067f7a81924404bfa3c",
-      "hash_actual": "434464b4e35a061cd2e7190038847a19f2319c64ca221e3b1fd0a06f18796ec3"
-    },
-    {
-      "id": 25,
-      "expediente_id": "EXP-2026-000003",
-      "n": 5,
-      "tipo": "firma_orden",
-      "detalle": "Orden ord-000003-aurora-r0 (ip -> 192.0.2.50, vence 105) firmada por jueza-laura-ficticia y despachada a aurora — huella f042b171bdcbc80ad1f8e1f1",
-      "minuto": 9.355,
-      "timestamp_iso": "2026-11-12T19:13:06",
-      "hash_prev": "434464b4e35a061cd2e7190038847a19f2319c64ca221e3b1fd0a06f18796ec3",
-      "hash_actual": "0d306c5a2e74a433017cfc91607cd82787a8b01356a23f78666c158bacd75d79"
-    },
-    {
-      "id": 26,
-      "expediente_id": "EXP-2026-000003",
-      "n": 6,
-      "tipo": "firma_orden",
-      "detalle": "Orden ord-000003-andina-r0 (ip -> 192.0.2.50, vence 105) firmada por jueza-laura-ficticia y despachada a andina — huella a4f2d94074c4bde237aa5aae",
-      "minuto": 9.355,
-      "timestamp_iso": "2026-11-12T19:13:06",
-      "hash_prev": "0d306c5a2e74a433017cfc91607cd82787a8b01356a23f78666c158bacd75d79",
-      "hash_actual": "ee64fc73561d0851e8917059befd04196899abe8ba4aef33935035b065a5033e"
-    },
-    {
-      "id": 27,
-      "expediente_id": "EXP-2026-000003",
-      "n": 7,
-      "tipo": "firma_orden",
-      "detalle": "Orden ord-000003-valle-r0 (dominio -> tv.verpartido-hd.test, vence 105) firmada por jueza-laura-ficticia y despachada a valle — huella 18703663e1c9f596b6ee4210",
-      "minuto": 9.355,
-      "timestamp_iso": "2026-11-12T19:13:06",
-      "hash_prev": "ee64fc73561d0851e8917059befd04196899abe8ba4aef33935035b065a5033e",
-      "hash_actual": "7e2541ed9f50aa3f3156688384b4663c8227a7a6ca5ead79337e48eaa8f372e1"
-    },
-    {
-      "id": 28,
-      "expediente_id": "EXP-2026-000003",
-      "n": 8,
-      "tipo": "firma_orden",
-      "detalle": "Orden ord-000003-cumbre-r0 (ip -> 192.0.2.50, vence 105) firmada por jueza-laura-ficticia y despachada a cumbre — huella 8cbb89df87c01ffb43733262",
-      "minuto": 9.355,
-      "timestamp_iso": "2026-11-12T19:13:06",
-      "hash_prev": "7e2541ed9f50aa3f3156688384b4663c8227a7a6ca5ead79337e48eaa8f372e1",
-      "hash_actual": "155fe683746e38e354bc7029827e4052d21096b370295eeb9178e6aa83b4f823"
+      "timestamp_iso": "2026-11-12T19:27:10",
+      "hash_prev": "9f1bd36ac2ed853fc783708e755533a15899265c346d4ef058e952a54894e22c",
+      "hash_actual": "4fe1e1f8cb09c81f6337816a744a622ca96bc43915660e7ffeda6a97c78feb49"
     },
     {
       "id": 29,
       "expediente_id": "EXP-2026-000003",
-      "n": 9,
-      "tipo": "confirmacion",
-      "detalle": "aurora aplicó ord-000003-aurora-r0 en el minuto 9.853",
-      "minuto": 10.25,
-      "timestamp_iso": "2026-11-12T19:13:07",
-      "hash_prev": "155fe683746e38e354bc7029827e4052d21096b370295eeb9178e6aa83b4f823",
-      "hash_actual": "6e8475875d275577fa637ad53e058640288291bc8ff7ceb2e7ba64c67132067c"
+      "n": 4,
+      "tipo": "dictamen",
+      "detalle": "Orden cautelar aprobada por jueza-laura-ficticia (forzando IP)",
+      "minuto": 9.047800000000134,
+      "timestamp_iso": "2026-11-12T19:27:10",
+      "hash_prev": "4fe1e1f8cb09c81f6337816a744a622ca96bc43915660e7ffeda6a97c78feb49",
+      "hash_actual": "d91e6feaeca0bfda7f8c2d1e7a8f346952e7cc6e7fe96791ba558fa8803c01f1"
+    },
+    {
+      "id": 30,
+      "expediente_id": "EXP-2026-000003",
+      "n": 5,
+      "tipo": "firma_orden",
+      "detalle": "Orden ord-000003-aurora-r0 (ip -> 192.0.2.50, vence 105) firmada por jueza-laura-ficticia y despachada a aurora — huella f042b171bdcbc80ad1f8e1f1",
+      "minuto": 9.047800000000134,
+      "timestamp_iso": "2026-11-12T19:27:10",
+      "hash_prev": "d91e6feaeca0bfda7f8c2d1e7a8f346952e7cc6e7fe96791ba558fa8803c01f1",
+      "hash_actual": "c0c97d516411dc19edca102ebcf67ab6e82945462305c2612bb2be749f401634"
+    },
+    {
+      "id": 31,
+      "expediente_id": "EXP-2026-000003",
+      "n": 6,
+      "tipo": "firma_orden",
+      "detalle": "Orden ord-000003-andina-r0 (ip -> 192.0.2.50, vence 105) firmada por jueza-laura-ficticia y despachada a andina — huella a4f2d94074c4bde237aa5aae",
+      "minuto": 9.047800000000134,
+      "timestamp_iso": "2026-11-12T19:27:10",
+      "hash_prev": "c0c97d516411dc19edca102ebcf67ab6e82945462305c2612bb2be749f401634",
+      "hash_actual": "fa65a582fc96f61a5328e1a72c15b83ce11509e9eb002b79d95732715ae4e15c"
     },
     {
       "id": 32,
       "expediente_id": "EXP-2026-000003",
+      "n": 7,
+      "tipo": "firma_orden",
+      "detalle": "Orden ord-000003-valle-r0 (dominio -> tv.verpartido-hd.test, vence 105) firmada por jueza-laura-ficticia y despachada a valle — huella 18703663e1c9f596b6ee4210",
+      "minuto": 9.047800000000134,
+      "timestamp_iso": "2026-11-12T19:27:10",
+      "hash_prev": "fa65a582fc96f61a5328e1a72c15b83ce11509e9eb002b79d95732715ae4e15c",
+      "hash_actual": "74df39b5583b666eddd4ee4b244aead185770bb80ce682f507dbdb9a5535cfa6"
+    },
+    {
+      "id": 33,
+      "expediente_id": "EXP-2026-000003",
+      "n": 8,
+      "tipo": "firma_orden",
+      "detalle": "Orden ord-000003-cumbre-r0 (ip -> 192.0.2.50, vence 105) firmada por jueza-laura-ficticia y despachada a cumbre — huella 8cbb89df87c01ffb43733262",
+      "minuto": 9.049400000000459,
+      "timestamp_iso": "2026-11-12T19:27:10",
+      "hash_prev": "74df39b5583b666eddd4ee4b244aead185770bb80ce682f507dbdb9a5535cfa6",
+      "hash_actual": "a70b6d29f021d705cae719d233d1110d949e6085dd223202295e4ff95bbbb49f"
+    },
+    {
+      "id": 35,
+      "expediente_id": "EXP-2026-000003",
+      "n": 9,
+      "tipo": "confirmacion",
+      "detalle": "aurora aplicó ord-000003-aurora-r0 en el minuto 9.547",
+      "minuto": 9.561499999999942,
+      "timestamp_iso": "2026-11-12T19:27:15",
+      "hash_prev": "a70b6d29f021d705cae719d233d1110d949e6085dd223202295e4ff95bbbb49f",
+      "hash_actual": "447b6232c5ce1d339fcdc2e103e302d8493be0df0285452576b6fd5f539a7f73"
+    },
+    {
+      "id": 37,
+      "expediente_id": "EXP-2026-000003",
       "n": 10,
       "tipo": "confirmacion",
-      "detalle": "andina aplicó ord-000003-andina-r0 en el minuto 11.123",
-      "minuto": 11.56699999999808,
-      "timestamp_iso": "2026-11-12T19:13:08",
-      "hash_prev": "6e8475875d275577fa637ad53e058640288291bc8ff7ceb2e7ba64c67132067c",
-      "hash_actual": "d70c35cead13dd9a42dc321caab223d6e25c22b06fc0f459bde98bbe8e789f5b"
-    },
-    {
-      "id": 38,
-      "expediente_id": "EXP-2026-000003",
-      "n": 11,
-      "tipo": "despacho",
-      "detalle": "cumbre reportó falla en ord-000003-cumbre-r0 (Error interno del proveedor. Reenviar la orden con un nuevo orden_id.). Reenviando.",
-      "minuto": 12.887000000005354,
-      "timestamp_iso": "2026-11-12T19:13:10",
-      "hash_prev": "d70c35cead13dd9a42dc321caab223d6e25c22b06fc0f459bde98bbe8e789f5b",
-      "hash_actual": "efc8a331ab9bc9cb1aa9398a357521a97a644aa6eab035395003e1883425e278"
-    },
-    {
-      "id": 39,
-      "expediente_id": "EXP-2026-000003",
-      "n": 12,
-      "tipo": "despacho",
-      "detalle": "Orden ord-000003-cumbre-r1 (ip -> 192.0.2.50, vence 105) firmada por jueza-laura-ficticia y despachada a cumbre — huella 5b71b14c2be190c36da883d9",
-      "minuto": 12.903000000001338,
-      "timestamp_iso": "2026-11-12T19:13:10",
-      "hash_prev": "efc8a331ab9bc9cb1aa9398a357521a97a644aa6eab035395003e1883425e278",
-      "hash_actual": "832704e1f64f090249958fd226b1eb4a8faa46c403b5c5570ebc9fd552803ecc"
+      "detalle": "andina aplicó ord-000003-andina-r0 en el minuto 10.817",
+      "minuto": 10.842199999999867,
+      "timestamp_iso": "2026-11-12T19:27:28",
+      "hash_prev": "447b6232c5ce1d339fcdc2e103e302d8493be0df0285452576b6fd5f539a7f73",
+      "hash_actual": "bc2079b13154971ec9dde5aa39f14dc463087d999d4094bf062833e53235517a"
     },
     {
       "id": 41,
       "expediente_id": "EXP-2026-000003",
-      "n": 13,
-      "tipo": "confirmacion",
-      "detalle": "valle aplicó ord-000003-valle-r0 en el minuto 13.629",
-      "minuto": 13.75,
-      "timestamp_iso": "2026-11-12T19:13:11",
-      "hash_prev": "832704e1f64f090249958fd226b1eb4a8faa46c403b5c5570ebc9fd552803ecc",
-      "hash_actual": "13fafe303abce2e7b5755f6071defbd9d7d6d531c791ad80c5cfbfbd758cd587"
+      "n": 11,
+      "tipo": "despacho",
+      "detalle": "cumbre reportó falla en ord-000003-cumbre-r0 (Error interno del proveedor. Reenviar la orden con un nuevo orden_id.). Reenviando.",
+      "minuto": 12.343699999999808,
+      "timestamp_iso": "2026-11-12T19:27:43",
+      "hash_prev": "bc2079b13154971ec9dde5aa39f14dc463087d999d4094bf062833e53235517a",
+      "hash_actual": "3c60460b9a8e58f719395ab7a5869aec34a8f854ff5fcb054d111aca69ed3381"
     },
     {
       "id": 42,
       "expediente_id": "EXP-2026-000003",
-      "n": 14,
-      "tipo": "reclamo",
-      "detalle": "Reclamo R-001 (panaderia-la-espiga.test): Panadería La Espiga: nuestros clientes no pueden entrar a la tienda online desde hace unos minutos. — la orden ord-000003-aurora-r0 en aurora lo afecta. Elevado al juez de turno para levantamiento y reemplazo por dominio.",
-      "minuto": 14.056999999998661,
-      "timestamp_iso": "2026-11-12T19:13:11",
-      "hash_prev": "13fafe303abce2e7b5755f6071defbd9d7d6d531c791ad80c5cfbfbd758cd587",
-      "hash_actual": "24772e8a145334854ac8dd1b7b59ab23f7a940a0383aa163b36182f9f9a29935"
+      "n": 12,
+      "tipo": "despacho",
+      "detalle": "Orden ord-000003-cumbre-r1 (ip -> 192.0.2.50, vence 105) firmada por jueza-laura-ficticia y despachada a cumbre — huella 5b71b14c2be190c36da883d9",
+      "minuto": 12.345300000000135,
+      "timestamp_iso": "2026-11-12T19:27:43",
+      "hash_prev": "3c60460b9a8e58f719395ab7a5869aec34a8f854ff5fcb054d111aca69ed3381",
+      "hash_actual": "6afe6f8d6178bdd4354ea77470680e93aaa460a9605d55b753909b638e40cd06"
     },
     {
       "id": 43,
       "expediente_id": "EXP-2026-000003",
-      "n": 15,
-      "tipo": "levantamiento",
-      "detalle": "Reclamo R-001 (panaderia-la-espiga.test): orden ord-000003-aurora-r0 levantada en aurora por jueza-laura-ficticia",
-      "minuto": 14.15100000000326,
-      "timestamp_iso": "2026-11-12T19:13:11",
-      "hash_prev": "24772e8a145334854ac8dd1b7b59ab23f7a940a0383aa163b36182f9f9a29935",
-      "hash_actual": "51b2244b1ed75cc70ebb8591c35d63631af7b0c25cba23e0f69cae303489e458"
+      "n": 13,
+      "tipo": "confirmacion",
+      "detalle": "valle aplicó ord-000003-valle-r0 en el minuto 13.323",
+      "minuto": 13.3375,
+      "timestamp_iso": "2026-11-12T19:27:53",
+      "hash_prev": "6afe6f8d6178bdd4354ea77470680e93aaa460a9605d55b753909b638e40cd06",
+      "hash_actual": "e6712275a0bd407a344355dbd96665814ecc17ea7b7985803c813b70c5f53399"
     },
     {
       "id": 44,
       "expediente_id": "EXP-2026-000003",
-      "n": 16,
-      "tipo": "despacho",
-      "detalle": "Reemplazo por bloqueo de dominio tv.verpartido-hd.test en aurora tras reclamo R-001",
-      "minuto": 14.15100000000326,
-      "timestamp_iso": "2026-11-12T19:13:11",
-      "hash_prev": "51b2244b1ed75cc70ebb8591c35d63631af7b0c25cba23e0f69cae303489e458",
-      "hash_actual": "ca20f7871428b1a853a2f6bf3a8449300eb4f56d42a059b8382d138273140b1a"
+      "n": 14,
+      "tipo": "reclamo",
+      "detalle": "Reclamo R-001 (panaderia-la-espiga.test): Panadería La Espiga: nuestros clientes no pueden entrar a la tienda online desde hace unos minutos. — la orden ord-000003-aurora-r0 en aurora lo afecta. Elevado al juez de turno para levantamiento y reemplazo por dominio.",
+      "minuto": 13.574699999999867,
+      "timestamp_iso": "2026-11-12T19:27:55",
+      "hash_prev": "e6712275a0bd407a344355dbd96665814ecc17ea7b7985803c813b70c5f53399",
+      "hash_actual": "9d3d2c25bbe53788deec5bb849637b44de7d80ab4d530e790415ba4447a03866"
     },
     {
       "id": 45,
       "expediente_id": "EXP-2026-000003",
-      "n": 17,
-      "tipo": "firma_orden",
-      "detalle": "Orden ord-000003-aurora-rep1-r0 (dominio -> tv.verpartido-hd.test, vence 105) firmada por jueza-laura-ficticia y despachada a aurora — huella 635eaa51e520d0cc6437c88e",
-      "minuto": 14.15100000000326,
-      "timestamp_iso": "2026-11-12T19:13:11",
-      "hash_prev": "ca20f7871428b1a853a2f6bf3a8449300eb4f56d42a059b8382d138273140b1a",
-      "hash_actual": "841c4e49409e5519486b497af93cec4cc2b1a4f5e611953168f5a208895cf35b"
+      "n": 15,
+      "tipo": "levantamiento",
+      "detalle": "Reclamo R-001 (panaderia-la-espiga.test): orden ord-000003-aurora-r0 levantada en aurora por jueza-laura-ficticia",
+      "minuto": 13.598100000000269,
+      "timestamp_iso": "2026-11-12T19:27:55",
+      "hash_prev": "9d3d2c25bbe53788deec5bb849637b44de7d80ab4d530e790415ba4447a03866",
+      "hash_actual": "858e6ff3edeb5e2cdb44ecdcf952a8a4287b397dd179fe304f8a38c640aa4012"
     },
     {
       "id": 46,
       "expediente_id": "EXP-2026-000003",
-      "n": 18,
-      "tipo": "confirmacion",
-      "detalle": "aurora aplicó ord-000003-aurora-rep1-r0 en el minuto 14.524",
-      "minuto": 14.575999999995984,
-      "timestamp_iso": "2026-11-12T19:13:11",
-      "hash_prev": "841c4e49409e5519486b497af93cec4cc2b1a4f5e611953168f5a208895cf35b",
-      "hash_actual": "08e6d41724b2c77500d5c05b32ed38506f94bc52600c9492ca57a80d007121ab"
+      "n": 16,
+      "tipo": "despacho",
+      "detalle": "Reemplazo por bloqueo de dominio tv.verpartido-hd.test en aurora tras reclamo R-001",
+      "minuto": 13.598100000000269,
+      "timestamp_iso": "2026-11-12T19:27:55",
+      "hash_prev": "858e6ff3edeb5e2cdb44ecdcf952a8a4287b397dd179fe304f8a38c640aa4012",
+      "hash_actual": "31741afe9c11143a1119318162d7cfa833be98cef192c67c18f009868ca73367"
+    },
+    {
+      "id": 47,
+      "expediente_id": "EXP-2026-000003",
+      "n": 17,
+      "tipo": "firma_orden",
+      "detalle": "Orden ord-000003-aurora-rep1-r0 (dominio -> tv.verpartido-hd.test, vence 105) firmada por jueza-laura-ficticia y despachada a aurora — huella 635eaa51e520d0cc6437c88e",
+      "minuto": 13.598100000000269,
+      "timestamp_iso": "2026-11-12T19:27:55",
+      "hash_prev": "31741afe9c11143a1119318162d7cfa833be98cef192c67c18f009868ca73367",
+      "hash_actual": "7c47a9f259fa089a788e091048e14f5b2efb59ba9a906008a1a5534b755a6e7d"
     },
     {
       "id": 48,
       "expediente_id": "EXP-2026-000003",
-      "n": 19,
-      "tipo": "reclamo",
-      "detalle": "Reclamo R-002 (panaderia-la-espiga.test): Panadería La Espiga: nuestros clientes no pueden entrar a la tienda online desde hace unos minutos. — la orden ord-000003-andina-r0 en andina lo afecta. Elevado al juez de turno para levantamiento y reemplazo por dominio.",
-      "minuto": 15.641000000002677,
-      "timestamp_iso": "2026-11-12T19:13:12",
-      "hash_prev": "08e6d41724b2c77500d5c05b32ed38506f94bc52600c9492ca57a80d007121ab",
-      "hash_actual": "979dd5c059c2b37200cba0cd7ae423dae3649de5fc5e40ef42008b1e53704f20"
+      "n": 18,
+      "tipo": "confirmacion",
+      "detalle": "aurora aplicó ord-000003-aurora-rep1-r0 en el minuto 13.946",
+      "minuto": 13.988399999999674,
+      "timestamp_iso": "2026-11-12T19:27:59",
+      "hash_prev": "7c47a9f259fa089a788e091048e14f5b2efb59ba9a906008a1a5534b755a6e7d",
+      "hash_actual": "03379722f44d1db69d9a919b5a954ed349adca507dab0fcd55b8878d5dc43136"
     },
     {
       "id": 49,
       "expediente_id": "EXP-2026-000003",
-      "n": 20,
-      "tipo": "levantamiento",
-      "detalle": "Reclamo R-002 (panaderia-la-espiga.test): orden ord-000003-andina-r0 levantada en andina por jueza-laura-ficticia",
-      "minuto": 15.751000000003259,
-      "timestamp_iso": "2026-11-12T19:13:13",
-      "hash_prev": "979dd5c059c2b37200cba0cd7ae423dae3649de5fc5e40ef42008b1e53704f20",
-      "hash_actual": "15ae1257dfc3ab78061380b0f1146b7949e2365beddeed60b9c8f9f887769433"
+      "n": 19,
+      "tipo": "reclamo",
+      "detalle": "Reclamo R-002 (panaderia-la-espiga.test): Panadería La Espiga: nuestros clientes no pueden entrar a la tienda online desde hace unos minutos. — la orden ord-000003-andina-r0 en andina lo afecta. Elevado al juez de turno para levantamiento y reemplazo por dominio.",
+      "minuto": 14.853100000000268,
+      "timestamp_iso": "2026-11-12T19:28:08",
+      "hash_prev": "03379722f44d1db69d9a919b5a954ed349adca507dab0fcd55b8878d5dc43136",
+      "hash_actual": "0b33ad3f54c44be689eee31067a35e57520d8a155d39ad3aa923b230a3504be6"
     },
     {
       "id": 50,
       "expediente_id": "EXP-2026-000003",
-      "n": 21,
-      "tipo": "despacho",
-      "detalle": "Reemplazo por bloqueo de dominio tv.verpartido-hd.test en andina tras reclamo R-002",
-      "minuto": 15.751000000003259,
-      "timestamp_iso": "2026-11-12T19:13:13",
-      "hash_prev": "15ae1257dfc3ab78061380b0f1146b7949e2365beddeed60b9c8f9f887769433",
-      "hash_actual": "d92adaf678a21724fd7cb2e9e6303ca221b3adb1289181eaf3a35f698854ab19"
+      "n": 20,
+      "tipo": "levantamiento",
+      "detalle": "Reclamo R-002 (panaderia-la-espiga.test): orden ord-000003-andina-r0 levantada en andina por jueza-laura-ficticia",
+      "minuto": 14.861000000000057,
+      "timestamp_iso": "2026-11-12T19:28:08",
+      "hash_prev": "0b33ad3f54c44be689eee31067a35e57520d8a155d39ad3aa923b230a3504be6",
+      "hash_actual": "b5a524764badb5cb5ed3db2f76ea08f9c72bba191a80524f8f2068a4062513f0"
     },
     {
       "id": 51,
       "expediente_id": "EXP-2026-000003",
+      "n": 21,
+      "tipo": "despacho",
+      "detalle": "Reemplazo por bloqueo de dominio tv.verpartido-hd.test en andina tras reclamo R-002",
+      "minuto": 14.861000000000057,
+      "timestamp_iso": "2026-11-12T19:28:08",
+      "hash_prev": "b5a524764badb5cb5ed3db2f76ea08f9c72bba191a80524f8f2068a4062513f0",
+      "hash_actual": "86100ea20fc93d83f57c6d6aa1746b4d2653191b2bb263912cfa07e142e2eb52"
+    },
+    {
+      "id": 52,
+      "expediente_id": "EXP-2026-000003",
       "n": 22,
       "tipo": "firma_orden",
       "detalle": "Orden ord-000003-andina-rep1-r0 (dominio -> tv.verpartido-hd.test, vence 105) firmada por jueza-laura-ficticia y despachada a andina — huella 79ed08e1b3abd5f684d4f703",
-      "minuto": 15.78199999999866,
-      "timestamp_iso": "2026-11-12T19:13:13",
-      "hash_prev": "d92adaf678a21724fd7cb2e9e6303ca221b3adb1289181eaf3a35f698854ab19",
-      "hash_actual": "8a27dd93b15d6ecaa1c14aa443851146dc0db4d04515a068ae9218b3b4125793"
+      "minuto": 14.862499999999999,
+      "timestamp_iso": "2026-11-12T19:28:08",
+      "hash_prev": "86100ea20fc93d83f57c6d6aa1746b4d2653191b2bb263912cfa07e142e2eb52",
+      "hash_actual": "0ba4b82292699473f6d0b399ac45ab8548643c5a92e87a8ee7a3b7e8ee034369"
     },
     {
       "id": 55,
       "expediente_id": "EXP-2026-000003",
       "n": 23,
       "tipo": "confirmacion",
-      "detalle": "cumbre aplicó ord-000003-cumbre-r1 en el minuto 16.605",
-      "minuto": 16.84800000000192,
-      "timestamp_iso": "2026-11-12T19:13:14",
-      "hash_prev": "8a27dd93b15d6ecaa1c14aa443851146dc0db4d04515a068ae9218b3b4125793",
-      "hash_actual": "7f4d36f81b6d9504c91dc48d95b558e4425a3716d65d4e133412da3ea0ecf538"
+      "detalle": "cumbre aplicó ord-000003-cumbre-r1 en el minuto 16.041",
+      "minuto": 16.07,
+      "timestamp_iso": "2026-11-12T19:28:20",
+      "hash_prev": "0ba4b82292699473f6d0b399ac45ab8548643c5a92e87a8ee7a3b7e8ee034369",
+      "hash_actual": "0bf3088a6ed29c090eff612d9e51c133e1761400b9adaa099170a414adca02a2"
     },
     {
       "id": 56,
       "expediente_id": "EXP-2026-000003",
       "n": 24,
       "tipo": "confirmacion",
-      "detalle": "andina aplicó ord-000003-andina-rep1-r0 en el minuto 17.641",
-      "minuto": 18.128000000001922,
-      "timestamp_iso": "2026-11-12T19:13:15",
-      "hash_prev": "7f4d36f81b6d9504c91dc48d95b558e4425a3716d65d4e133412da3ea0ecf538",
-      "hash_actual": "f1be10bbe760943490898de8ce81f966ea20682f32d23afdcf1c78f071c576cf"
+      "detalle": "andina aplicó ord-000003-andina-rep1-r0 en el minuto 16.726",
+      "minuto": 16.77,
+      "timestamp_iso": "2026-11-12T19:28:27",
+      "hash_prev": "0bf3088a6ed29c090eff612d9e51c133e1761400b9adaa099170a414adca02a2",
+      "hash_actual": "e038c2b53d755d9fa5af54338cf770bb9a0d848a892eddfd3427fdbc73ffc18e"
     },
     {
       "id": 57,
@@ -449,9 +449,9 @@
       "tipo": "evidencia",
       "detalle": "Evidencia D-0007 acreditada y custodiada: captura mpegts 6 s (sha256 84611ff1afa7688b0be7…), huella e287c3527443e982de78139f",
       "minuto": 19.0,
-      "timestamp_iso": "2026-11-12T19:13:16",
-      "hash_prev": "f1be10bbe760943490898de8ce81f966ea20682f32d23afdcf1c78f071c576cf",
-      "hash_actual": "6e1e6b394ad22b8c0dc981e1d04c73cfdc6acb8c339e4aa30c4669b6b0efa0a1"
+      "timestamp_iso": "2026-11-12T19:28:49",
+      "hash_prev": "e038c2b53d755d9fa5af54338cf770bb9a0d848a892eddfd3427fdbc73ffc18e",
+      "hash_actual": "3d1493543cf88c6dc9d626d41cd337588ef7c3bfb166bf284587a0a8b9d511c2"
     },
     {
       "id": 58,
@@ -460,9 +460,9 @@
       "tipo": "deteccion",
       "detalle": "D-0007 — señal oficial pirata en tv.verpartido-hd.test (192.0.2.50, ASN 64620), marca LP26-PRA-OFI-S010457",
       "minuto": 19.0,
-      "timestamp_iso": "2026-11-12T19:13:16",
-      "hash_prev": "6e1e6b394ad22b8c0dc981e1d04c73cfdc6acb8c339e4aa30c4669b6b0efa0a1",
-      "hash_actual": "bcca00b5eca7358d7d8932b3d7b50beb13c19627620bde0b7259a95f0389c4ec"
+      "timestamp_iso": "2026-11-12T19:28:49",
+      "hash_prev": "3d1493543cf88c6dc9d626d41cd337588ef7c3bfb166bf284587a0a8b9d511c2",
+      "hash_actual": "d15f6544ad7652d1917f3016fd71f761b4ba992d48f5059bed90270f5d8d4d3f"
     },
     {
       "id": 60,
@@ -470,10 +470,10 @@
       "n": 27,
       "tipo": "reclamo",
       "detalle": "Reclamo R-003 (panaderia-la-espiga.test): Panadería La Espiga: nuestros clientes no pueden entrar a la tienda online desde hace unos minutos. — la orden ord-000003-cumbre-r1 en cumbre lo afecta. Elevado al juez de turno para levantamiento y reemplazo por dominio.",
-      "minuto": 20.894999999999417,
-      "timestamp_iso": "2026-11-12T19:13:18",
-      "hash_prev": "bcca00b5eca7358d7d8932b3d7b50beb13c19627620bde0b7259a95f0389c4ec",
-      "hash_actual": "a904345b46faa7461795928424b968336aa65339bbd401c6035997fad2c087c1"
+      "minuto": 20.063100000000265,
+      "timestamp_iso": "2026-11-12T19:29:00",
+      "hash_prev": "d15f6544ad7652d1917f3016fd71f761b4ba992d48f5059bed90270f5d8d4d3f",
+      "hash_actual": "0d9307bc0771deb4748c702e70330066cbf81ed4b18c387383f00dd10811834e"
     },
     {
       "id": 61,
@@ -481,10 +481,10 @@
       "n": 28,
       "tipo": "levantamiento",
       "detalle": "Reclamo R-003 (panaderia-la-espiga.test): orden ord-000003-cumbre-r1 levantada en cumbre por jueza-laura-ficticia",
-      "minuto": 21.144999999999417,
-      "timestamp_iso": "2026-11-12T19:13:18",
-      "hash_prev": "a904345b46faa7461795928424b968336aa65339bbd401c6035997fad2c087c1",
-      "hash_actual": "3adcee51c0969997be61dfb6e1542f0425e598663af6e8b7da5218550b248a84"
+      "minuto": 20.066200000000535,
+      "timestamp_iso": "2026-11-12T19:29:00",
+      "hash_prev": "0d9307bc0771deb4748c702e70330066cbf81ed4b18c387383f00dd10811834e",
+      "hash_actual": "e9dc328660d069fa6a4c4da726947a363a43640c604ec8df6186f0ae0d3c73ab"
     },
     {
       "id": 62,
@@ -492,10 +492,10 @@
       "n": 29,
       "tipo": "despacho",
       "detalle": "Reemplazo por bloqueo de dominio tv.verpartido-hd.test en cumbre tras reclamo R-003",
-      "minuto": 21.144999999999417,
-      "timestamp_iso": "2026-11-12T19:13:18",
-      "hash_prev": "3adcee51c0969997be61dfb6e1542f0425e598663af6e8b7da5218550b248a84",
-      "hash_actual": "8ec3c0a452fa3c17cb7000851eef0d8b2b079684a02605d003b1b596a85fda8d"
+      "minuto": 20.066200000000535,
+      "timestamp_iso": "2026-11-12T19:29:00",
+      "hash_prev": "e9dc328660d069fa6a4c4da726947a363a43640c604ec8df6186f0ae0d3c73ab",
+      "hash_actual": "d18eed582117b899e395dc266d17957cb00d721616c387fa6367b04e22c6ed57"
     },
     {
       "id": 63,
@@ -503,21 +503,21 @@
       "n": 30,
       "tipo": "firma_orden",
       "detalle": "Orden ord-000003-cumbre-rep2-r0 (dominio -> tv.verpartido-hd.test, vence 105) firmada por jueza-laura-ficticia y despachada a cumbre — huella 3622f0f83485cae676fbcb1a",
-      "minuto": 21.1609999999954,
-      "timestamp_iso": "2026-11-12T19:13:18",
-      "hash_prev": "8ec3c0a452fa3c17cb7000851eef0d8b2b079684a02605d003b1b596a85fda8d",
-      "hash_actual": "530eea65a7c18bbee996079580020f8285198173469bd5576fd8aa3013a49c6e"
+      "minuto": 20.066200000000535,
+      "timestamp_iso": "2026-11-12T19:29:00",
+      "hash_prev": "d18eed582117b899e395dc266d17957cb00d721616c387fa6367b04e22c6ed57",
+      "hash_actual": "d685cde0147d1cd2ae76890092ddbb93006faa822ba047cea545a296f19bdb2d"
     },
     {
       "id": 66,
       "expediente_id": "EXP-2026-000003",
       "n": 31,
       "tipo": "confirmacion",
-      "detalle": "cumbre aplicó ord-000003-cumbre-rep2-r0 en el minuto 24.758",
-      "minuto": 25.22000000000058,
-      "timestamp_iso": "2026-11-12T19:13:22",
-      "hash_prev": "530eea65a7c18bbee996079580020f8285198173469bd5576fd8aa3013a49c6e",
-      "hash_actual": "828fc8004be722f3023ea99e9468260b54c1f868ebdb29506f447eb5586a5c79"
+      "detalle": "cumbre aplicó ord-000003-cumbre-rep2-r0 en el minuto 23.671",
+      "minuto": 23.706199999999807,
+      "timestamp_iso": "2026-11-12T19:29:36",
+      "hash_prev": "d685cde0147d1cd2ae76890092ddbb93006faa822ba047cea545a296f19bdb2d",
+      "hash_actual": "3b61d87ba5bf100aff77b650f8655227daf814a8152663c96683d53e6885fc47"
     },
     {
       "id": 69,
@@ -526,9 +526,9 @@
       "tipo": "evidencia",
       "detalle": "Evidencia D-0011 acreditada y custodiada: captura mpegts 6 s (sha256 5be46a406ae3a2870856…), huella e3715a858ffcb562b58b7a13",
       "minuto": 29.0,
-      "timestamp_iso": "2026-11-12T19:13:26",
-      "hash_prev": "828fc8004be722f3023ea99e9468260b54c1f868ebdb29506f447eb5586a5c79",
-      "hash_actual": "348cce6a24c6cd27d2ba089079d10a3454402584501c1bbea78165c97a8f2126"
+      "timestamp_iso": "2026-11-12T19:30:30",
+      "hash_prev": "3b61d87ba5bf100aff77b650f8655227daf814a8152663c96683d53e6885fc47",
+      "hash_actual": "8b610c55a054fe4bf827369d675f680c65375296c6795533cdb9eb386d8c8a44"
     },
     {
       "id": 70,
@@ -537,9 +537,9 @@
       "tipo": "deteccion",
       "detalle": "D-0011 — señal oficial pirata en tv.verpartido-hd.test (192.0.2.50, ASN 64620), marca LP26-PRA-OFI-S010457",
       "minuto": 29.0,
-      "timestamp_iso": "2026-11-12T19:13:26",
-      "hash_prev": "348cce6a24c6cd27d2ba089079d10a3454402584501c1bbea78165c97a8f2126",
-      "hash_actual": "5557743f96dd9f6c3a8a0162816abfde31ac9d3c12c8fe17b49b282834826fe1"
+      "timestamp_iso": "2026-11-12T19:30:30",
+      "hash_prev": "8b610c55a054fe4bf827369d675f680c65375296c6795533cdb9eb386d8c8a44",
+      "hash_actual": "c8ff450158699a86f7b38ed1dc87f550bfe13d4f6669e3bba35dcfef7622cbc8"
     },
     {
       "id": 84,
@@ -548,9 +548,9 @@
       "tipo": "evidencia",
       "detalle": "Evidencia D-0015 acreditada y custodiada: captura mpegts 6 s (sha256 496bd83a056ceafd8e7a…), huella d64d09ebdae90957e631ee71",
       "minuto": 39.0,
-      "timestamp_iso": "2026-11-12T19:13:36",
-      "hash_prev": "5557743f96dd9f6c3a8a0162816abfde31ac9d3c12c8fe17b49b282834826fe1",
-      "hash_actual": "5080aca554520c413014bfb8b8580de0eb5b4c7662a31d557aa7ec3ed49f1a95"
+      "timestamp_iso": "2026-11-12T19:32:10",
+      "hash_prev": "c8ff450158699a86f7b38ed1dc87f550bfe13d4f6669e3bba35dcfef7622cbc8",
+      "hash_actual": "4318b0bcbe0c4ce19f1ec6c795e80780926956a7159e76cbaeaca5953733b388"
     },
     {
       "id": 85,
@@ -559,9 +559,9 @@
       "tipo": "deteccion",
       "detalle": "D-0015 — señal oficial pirata en tv.verpartido-hd.test (192.0.2.50, ASN 64620), marca LP26-PRA-OFI-S010457",
       "minuto": 39.0,
-      "timestamp_iso": "2026-11-12T19:13:36",
-      "hash_prev": "5080aca554520c413014bfb8b8580de0eb5b4c7662a31d557aa7ec3ed49f1a95",
-      "hash_actual": "071d29c6962914dc035d9764eca9e97ec7384cd33381b252bb82e9ce2800884a"
+      "timestamp_iso": "2026-11-12T19:32:10",
+      "hash_prev": "4318b0bcbe0c4ce19f1ec6c795e80780926956a7159e76cbaeaca5953733b388",
+      "hash_actual": "8358893a1251197fd23c7d6a24c53d9fc990d1ba6f7652a374e3ec4e5b535b6d"
     },
     {
       "id": 94,
@@ -570,9 +570,9 @@
       "tipo": "evidencia",
       "detalle": "Evidencia D-0019 acreditada y custodiada: captura mpegts 6 s (sha256 92de62444c085833296b…), huella 78083d9f81309761f59350f4",
       "minuto": 49.0,
-      "timestamp_iso": "2026-11-12T19:13:46",
-      "hash_prev": "071d29c6962914dc035d9764eca9e97ec7384cd33381b252bb82e9ce2800884a",
-      "hash_actual": "abc5407538ab0a5a0511ed4f27d1b82c59037ccfd9bb22213a68a638f5456067"
+      "timestamp_iso": "2026-11-12T19:33:50",
+      "hash_prev": "8358893a1251197fd23c7d6a24c53d9fc990d1ba6f7652a374e3ec4e5b535b6d",
+      "hash_actual": "0ab5f72ed12f4ce1be38ff8bb771c651d5ae1554d008f8e5953800b80898a746"
     },
     {
       "id": 95,
@@ -581,31 +581,31 @@
       "tipo": "deteccion",
       "detalle": "D-0019 — señal oficial pirata en tv.verpartido-hd.test (192.0.2.50, ASN 64620), marca LP26-PRA-OFI-S010457",
       "minuto": 49.0,
-      "timestamp_iso": "2026-11-12T19:13:46",
-      "hash_prev": "abc5407538ab0a5a0511ed4f27d1b82c59037ccfd9bb22213a68a638f5456067",
-      "hash_actual": "63b824ef0d9916d8c8abba348e92ebedfa6e394c10c7bda276ab4d42849e2165"
+      "timestamp_iso": "2026-11-12T19:33:50",
+      "hash_prev": "0ab5f72ed12f4ce1be38ff8bb771c651d5ae1554d008f8e5953800b80898a746",
+      "hash_actual": "7dbc4652d6887740ccdee2ee38a20b7cc6eba1802f6dc3395d61b6d7d3840e88"
     },
     {
-      "id": 112,
+      "id": 113,
       "expediente_id": "EXP-2026-000003",
       "n": 38,
       "tipo": "evidencia",
       "detalle": "Evidencia D-0024 acreditada y custodiada: captura mpegts 6 s (sha256 885c40e4bfeb2a8eb6c1…), huella 05ec0d046365a02a227e5211",
       "minuto": 59.0,
-      "timestamp_iso": "2026-11-12T19:13:56",
-      "hash_prev": "63b824ef0d9916d8c8abba348e92ebedfa6e394c10c7bda276ab4d42849e2165",
-      "hash_actual": "2a252f48d59b1588d7e2d03d393674140e1e5ab2f613fb4010d54d06a7713272"
+      "timestamp_iso": "2026-11-12T19:35:30",
+      "hash_prev": "7dbc4652d6887740ccdee2ee38a20b7cc6eba1802f6dc3395d61b6d7d3840e88",
+      "hash_actual": "a33ffe6a94f518ea2edc5ef8ac950cd6fd37bbe226034468d175a6370d6cb97d"
     },
     {
-      "id": 113,
+      "id": 114,
       "expediente_id": "EXP-2026-000003",
       "n": 39,
       "tipo": "deteccion",
       "detalle": "D-0024 — señal oficial pirata en tv.verpartido-hd.test (192.0.2.50, ASN 64620), marca LP26-PRA-OFI-S010457",
       "minuto": 59.0,
-      "timestamp_iso": "2026-11-12T19:13:56",
-      "hash_prev": "2a252f48d59b1588d7e2d03d393674140e1e5ab2f613fb4010d54d06a7713272",
-      "hash_actual": "932753c053d473ac3a05c19bca0935033ee79c8b46af0ad00010e465be027c6c"
+      "timestamp_iso": "2026-11-12T19:35:30",
+      "hash_prev": "a33ffe6a94f518ea2edc5ef8ac950cd6fd37bbe226034468d175a6370d6cb97d",
+      "hash_actual": "638d231e23783ce13acb43fcd16ac80e399ed82a464dffbebc482643fd13b9c1"
     },
     {
       "id": 122,
@@ -614,9 +614,9 @@
       "tipo": "evidencia",
       "detalle": "Evidencia D-0028 acreditada y custodiada: captura mpegts 6 s (sha256 c2f723a8ff65a3a587e5…), huella 03f9aaf81ffd214d619226ff",
       "minuto": 69.0,
-      "timestamp_iso": "2026-11-12T19:14:06",
-      "hash_prev": "932753c053d473ac3a05c19bca0935033ee79c8b46af0ad00010e465be027c6c",
-      "hash_actual": "2778df8cc55c2f1df00df2bb9cf22c97dda919773d2cbcce738d816c405cc464"
+      "timestamp_iso": "2026-11-12T19:37:10",
+      "hash_prev": "638d231e23783ce13acb43fcd16ac80e399ed82a464dffbebc482643fd13b9c1",
+      "hash_actual": "75dc7a9ea6898e7371c2bb9dd6cfe406684f67a885e51627ffc7c3811700f5d9"
     },
     {
       "id": 123,
@@ -625,9 +625,9 @@
       "tipo": "deteccion",
       "detalle": "D-0028 — señal oficial pirata en tv.verpartido-hd.test (192.0.2.50, ASN 64620), marca LP26-PRA-OFI-S010457",
       "minuto": 69.0,
-      "timestamp_iso": "2026-11-12T19:14:06",
-      "hash_prev": "2778df8cc55c2f1df00df2bb9cf22c97dda919773d2cbcce738d816c405cc464",
-      "hash_actual": "503378f8464fc571b01061117e9fa2fff47df0f0afd6d4ae8650d4255429d2b6"
+      "timestamp_iso": "2026-11-12T19:37:10",
+      "hash_prev": "75dc7a9ea6898e7371c2bb9dd6cfe406684f67a885e51627ffc7c3811700f5d9",
+      "hash_actual": "8e0b2e34e16b6536101ee2e0ac3595aef400b4d51d588fb30ce22f953bf0da75"
     },
     {
       "id": 140,
@@ -636,9 +636,9 @@
       "tipo": "evidencia",
       "detalle": "Evidencia D-0032 acreditada y custodiada: captura mpegts 6 s (sha256 9934e51369cdad365b8b…), huella 0911fcaa03d1aa5c094bdb59",
       "minuto": 79.0,
-      "timestamp_iso": "2026-11-12T19:14:16",
-      "hash_prev": "503378f8464fc571b01061117e9fa2fff47df0f0afd6d4ae8650d4255429d2b6",
-      "hash_actual": "e912c4dd632b2b8f00d8274bd45b0cec411f14b923821547a69e29686a34f7ab"
+      "timestamp_iso": "2026-11-12T19:38:50",
+      "hash_prev": "8e0b2e34e16b6536101ee2e0ac3595aef400b4d51d588fb30ce22f953bf0da75",
+      "hash_actual": "02a6f02a811456b59c267a26e42b6914007b07cad17de8b16e5d14dc606197e2"
     },
     {
       "id": 141,
@@ -647,9 +647,9 @@
       "tipo": "deteccion",
       "detalle": "D-0032 — señal oficial pirata en tv.verpartido-hd.test (192.0.2.50, ASN 64620), marca LP26-PRA-OFI-S010457",
       "minuto": 79.0,
-      "timestamp_iso": "2026-11-12T19:14:16",
-      "hash_prev": "e912c4dd632b2b8f00d8274bd45b0cec411f14b923821547a69e29686a34f7ab",
-      "hash_actual": "13d142e720fee08bf12d1e71036edf1cd23f82bb675cbda6511a88d63f99e3d6"
+      "timestamp_iso": "2026-11-12T19:38:50",
+      "hash_prev": "02a6f02a811456b59c267a26e42b6914007b07cad17de8b16e5d14dc606197e2",
+      "hash_actual": "5c58b697bc97b77186544f64ea8d7f4d0a998b96905456810301d20e26688da0"
     },
     {
       "id": 159,
@@ -658,9 +658,9 @@
       "tipo": "evidencia",
       "detalle": "Evidencia D-0037 acreditada y custodiada: captura mpegts 6 s (sha256 bbe766ac782d55592fdc…), huella f01adae5ab45555d61e99ffe",
       "minuto": 89.0,
-      "timestamp_iso": "2026-11-12T19:14:26",
-      "hash_prev": "13d142e720fee08bf12d1e71036edf1cd23f82bb675cbda6511a88d63f99e3d6",
-      "hash_actual": "201a2b754fcba090e909a01427bdb34b86e92244cf8337c6a9ef0b97a4faae70"
+      "timestamp_iso": "2026-11-12T19:40:30",
+      "hash_prev": "5c58b697bc97b77186544f64ea8d7f4d0a998b96905456810301d20e26688da0",
+      "hash_actual": "e0e3a83ad3551b22f498e1994583fc47d5ce8b1beab8b79303bd5fd47baee99d"
     },
     {
       "id": 160,
@@ -669,9 +669,9 @@
       "tipo": "deteccion",
       "detalle": "D-0037 — señal oficial pirata en tv.verpartido-hd.test (192.0.2.50, ASN 64620), marca LP26-PRA-OFI-S010457",
       "minuto": 89.0,
-      "timestamp_iso": "2026-11-12T19:14:26",
-      "hash_prev": "201a2b754fcba090e909a01427bdb34b86e92244cf8337c6a9ef0b97a4faae70",
-      "hash_actual": "513729b189814b2b6127c2da02a625f1300dfe49848160a99eee77ecc250b755"
+      "timestamp_iso": "2026-11-12T19:40:30",
+      "hash_prev": "e0e3a83ad3551b22f498e1994583fc47d5ce8b1beab8b79303bd5fd47baee99d",
+      "hash_actual": "eafc189b1a86740795ea3004053a39d26c1bee94e82e279844c6c722fee02834"
     },
     {
       "id": 167,
@@ -680,9 +680,9 @@
       "tipo": "evidencia",
       "detalle": "Evidencia D-0041 acreditada y custodiada: captura mpegts 6 s (sha256 a363eac222042b343787…), huella 82d2b09ef550f2f7a8627612",
       "minuto": 99.0,
-      "timestamp_iso": "2026-11-12T19:14:36",
-      "hash_prev": "513729b189814b2b6127c2da02a625f1300dfe49848160a99eee77ecc250b755",
-      "hash_actual": "f9f5b662adf10f1b0214f6a5fb6c27e3b400b3c6ab89e3fdaf4fb8b16e5efabe"
+      "timestamp_iso": "2026-11-12T19:42:10",
+      "hash_prev": "eafc189b1a86740795ea3004053a39d26c1bee94e82e279844c6c722fee02834",
+      "hash_actual": "243e68b85c7a182ba53afd598701956b4ee43edae99cc72c0e14eebb719bc274"
     },
     {
       "id": 168,
@@ -691,25 +691,25 @@
       "tipo": "deteccion",
       "detalle": "D-0041 — señal oficial pirata en tv.verpartido-hd.test (192.0.2.50, ASN 64620), marca LP26-PRA-OFI-S010457",
       "minuto": 99.0,
-      "timestamp_iso": "2026-11-12T19:14:36",
-      "hash_prev": "f9f5b662adf10f1b0214f6a5fb6c27e3b400b3c6ab89e3fdaf4fb8b16e5efabe",
-      "hash_actual": "1c474ee955801184280dbad8ccb4c9af7237295e2b7e21cf2458b966a78d8ab1"
+      "timestamp_iso": "2026-11-12T19:42:10",
+      "hash_prev": "243e68b85c7a182ba53afd598701956b4ee43edae99cc72c0e14eebb719bc274",
+      "hash_actual": "892022749b42fd91a58a931fce4354c2980ac77d04dcc363f627bc3cdedc6429"
     },
     {
       "id": 175,
       "expediente_id": "EXP-2026-000003",
       "n": 48,
       "tipo": "vencimiento",
-      "detalle": "Vencieron las medidas cautelares (fin del partido + 5 min de gracia, min 110.0): el expediente pasa a archivo",
-      "minuto": 110.015,
-      "timestamp_iso": "2026-11-12T19:14:47",
-      "hash_prev": "1c474ee955801184280dbad8ccb4c9af7237295e2b7e21cf2458b966a78d8ab1",
-      "hash_actual": "072707b304cbecc3b2e0df4da6069c17b44d9d2b7cbdba83d1f41aefb57c3103"
+      "detalle": "Vencieron las medidas cautelares (fin del partido + 5 min de gracia, min 110.1): el expediente pasa a archivo",
+      "minuto": 110.05469999999987,
+      "timestamp_iso": "2026-11-12T19:44:00",
+      "hash_prev": "892022749b42fd91a58a931fce4354c2980ac77d04dcc363f627bc3cdedc6429",
+      "hash_actual": "2b3fe2dacd5dfaeecc82c12e8144d96b414b990add951a70e4ff939aa423f237"
     }
   ],
   "ordenes": [
     {
-      "id": 9,
+      "id": 10,
       "orden_id": "ord-000003-aurora-r0",
       "expediente_id": "EXP-2026-000003",
       "proveedor_id": "aurora",
@@ -719,14 +719,14 @@
       "juzgado_id": "jg-centro-3",
       "juez_id": "jueza-laura-ficticia",
       "firma": "caed765ef61587ed5b581805418bd9fd8016b120c6840ddc005ddee0c73177c5",
+      "huella": "f042b171bdcbc80ad1f8e1f149fa986389c57c0459692e66d6e4da8878744fe5",
       "estado": "levantada",
       "intento": 0,
-      "minuto_envio": 9.355,
-      "minuto_aplicada": 9.853,
-      "huella": "f042b171bdcbc80ad1f8e1f149fa986389c57c0459692e66d6e4da8878744fe5"
+      "minuto_envio": 9.047800000000134,
+      "minuto_aplicada": 9.547
     },
     {
-      "id": 10,
+      "id": 11,
       "orden_id": "ord-000003-andina-r0",
       "expediente_id": "EXP-2026-000003",
       "proveedor_id": "andina",
@@ -736,14 +736,14 @@
       "juzgado_id": "jg-centro-3",
       "juez_id": "jueza-laura-ficticia",
       "firma": "19cbe0536cee821c5e2b977f0278a1439e4ca3dc988f5d5bb1104f367e4471e6",
+      "huella": "a4f2d94074c4bde237aa5aae91971f2d7bff205d31d1b52848c6419628861437",
       "estado": "levantada",
       "intento": 0,
-      "minuto_envio": 9.355,
-      "minuto_aplicada": 11.123,
-      "huella": "a4f2d94074c4bde237aa5aae91971f2d7bff205d31d1b52848c6419628861437"
+      "minuto_envio": 9.047800000000134,
+      "minuto_aplicada": 10.817
     },
     {
-      "id": 11,
+      "id": 12,
       "orden_id": "ord-000003-valle-r0",
       "expediente_id": "EXP-2026-000003",
       "proveedor_id": "valle",
@@ -753,14 +753,14 @@
       "juzgado_id": "jg-centro-3",
       "juez_id": "jueza-laura-ficticia",
       "firma": "91f4a17111084e10a05bf3b1dedf9978d0939da7b92952e80b690a2d6df738cd",
+      "huella": "18703663e1c9f596b6ee421016ca2e0aa6145231ba1a0aadfc075abf19f76945",
       "estado": "vencida",
       "intento": 0,
-      "minuto_envio": 9.355,
-      "minuto_aplicada": 13.629,
-      "huella": "18703663e1c9f596b6ee421016ca2e0aa6145231ba1a0aadfc075abf19f76945"
+      "minuto_envio": 9.047800000000134,
+      "minuto_aplicada": 13.323
     },
     {
-      "id": 12,
+      "id": 13,
       "orden_id": "ord-000003-cumbre-r0",
       "expediente_id": "EXP-2026-000003",
       "proveedor_id": "cumbre",
@@ -770,11 +770,11 @@
       "juzgado_id": "jg-centro-3",
       "juez_id": "jueza-laura-ficticia",
       "firma": "3dd6627797f40955de99697847188826207654d7faefc7eb8ea13f5806272ae0",
+      "huella": "8cbb89df87c01ffb43733262097a8b5d6cdd06a2ef953950a1da2b84ec9d53bc",
       "estado": "fallida",
       "intento": 0,
-      "minuto_envio": 9.355,
-      "minuto_aplicada": null,
-      "huella": "8cbb89df87c01ffb43733262097a8b5d6cdd06a2ef953950a1da2b84ec9d53bc"
+      "minuto_envio": 9.049400000000459,
+      "minuto_aplicada": null
     },
     {
       "id": 14,
@@ -787,11 +787,11 @@
       "juzgado_id": "jg-centro-3",
       "juez_id": "jueza-laura-ficticia",
       "firma": "97e8fe96e38e681f114639aefa2124fb2e8dbeffd7b941269e53cbccaebe441b",
+      "huella": "5b71b14c2be190c36da883d9a02a8ddc7d23b1dcc7b797843c28443bed2d53dc",
       "estado": "levantada",
       "intento": 1,
-      "minuto_envio": 12.903000000001338,
-      "minuto_aplicada": 16.605,
-      "huella": "5b71b14c2be190c36da883d9a02a8ddc7d23b1dcc7b797843c28443bed2d53dc"
+      "minuto_envio": 12.345300000000135,
+      "minuto_aplicada": 16.041
     },
     {
       "id": 15,
@@ -804,11 +804,11 @@
       "juzgado_id": "jg-centro-3",
       "juez_id": "jueza-laura-ficticia",
       "firma": "4263b46de975a9e71f0f817e737c9041873209f8233efdcbce4e062988d1ff42",
+      "huella": "635eaa51e520d0cc6437c88e6aa7f380b44ebdd0f25340794403e33e30a22a0f",
       "estado": "vencida",
       "intento": 0,
-      "minuto_envio": 14.15100000000326,
-      "minuto_aplicada": 14.524,
-      "huella": "635eaa51e520d0cc6437c88e6aa7f380b44ebdd0f25340794403e33e30a22a0f"
+      "minuto_envio": 13.598100000000269,
+      "minuto_aplicada": 13.946
     },
     {
       "id": 16,
@@ -821,11 +821,11 @@
       "juzgado_id": "jg-centro-3",
       "juez_id": "jueza-laura-ficticia",
       "firma": "dfc0d1a76de98a82333edca04e9453fa87398b46e3751a4cd8e083397fbf8ae2",
+      "huella": "79ed08e1b3abd5f684d4f7039ea262da12ab3720c03414786df93ad4a211b0fd",
       "estado": "vencida",
       "intento": 0,
-      "minuto_envio": 15.78199999999866,
-      "minuto_aplicada": 17.641,
-      "huella": "79ed08e1b3abd5f684d4f7039ea262da12ab3720c03414786df93ad4a211b0fd"
+      "minuto_envio": 14.862499999999999,
+      "minuto_aplicada": 16.726
     },
     {
       "id": 17,
@@ -838,11 +838,11 @@
       "juzgado_id": "jg-centro-3",
       "juez_id": "jueza-laura-ficticia",
       "firma": "389fade4386ad26e9c3f8a2ea168f953910d875f932557f22847aeb3960bfab3",
+      "huella": "3622f0f83485cae676fbcb1a8eb36cf98b6eec7589f078f8a2d5c5951755a71a",
       "estado": "vencida",
       "intento": 0,
-      "minuto_envio": 21.1609999999954,
-      "minuto_aplicada": 24.758,
-      "huella": "3622f0f83485cae676fbcb1a8eb36cf98b6eec7589f078f8a2d5c5951755a71a"
+      "minuto_envio": 20.066200000000535,
+      "minuto_aplicada": 23.671
     }
   ]
 }
