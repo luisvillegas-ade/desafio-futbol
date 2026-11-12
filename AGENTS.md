@@ -7,24 +7,28 @@ ya descubiertas. Leer esto ANTES de tocar código.
 
 ---
 
-## 1. Estado actual (al cierre del jueves 12)
+## 1. Estado actual (post-correcciones de auditoría, vie 13)
 
 | Componente | Estado |
 |---|---|
 | Motor completo (`plataforma/`) | ✅ Hecho y verificado |
-| Detecciones → expediente → firma → 4 ISPs → vencimiento | ✅ 7/7 fases, residual **4.7 %** |
+| Detecciones → expediente → firma → 4 ISPs → vencimiento | ✅ 7/7 fases, residual 7.3 % (interactivo + demo reclamos) |
 | Daño colateral / falsos positivos / fuera de turno / IP post-partido | ✅ **0** en todo |
-| Reintentos Cumbre (35 % falla) | ✅ re-firma con juez de turno vigente |
-| Buffer de cambio de turno (min 50) | ✅ verificado con `--inicio-min 45` |
-| Reclamos (levantar + reemplazo por dominio) | ✅ verificado end-to-end |
-| UI por roles (juez/secretario/operador/admin) + pases + revisión + informe | ✅ verificado en vivo |
-| Portal público: /transparencia + /reclamar + /monitor TUI | ✅ funcional |
-| Verificador de cadena de custodia (`auditoria/verificar_cadena.py`) | ✅ detecta tampering |
-| Cadena de custodia (hash encadenado) + exportador | ✅ `entrega/*.json` regenerados de corrida 7/7 |
-| `entrega/propuesta-normativa.md` | ✅ borrador escrito (1 página, 5 puntos) |
+| **Firma personal del juez (regla de la org)** | ✅ `aprobada_por`: firma solo quien clickeó y sigue de turno; si no, el expediente se re-eleva al entrante y espera su clic |
+| **Reclamos a la bandeja del juez** | ✅ quedan `elevado` + botón "hacer lugar": el juez firma el levantamiento con SU clave + reemplazo por dominio |
+| Reintentos Cumbre (35 % falla) | ✅ `orden_id` único `ord-<n>-<pid>-rep<m>-r<i>` (antes colisionaban → 409) |
+| Buffer de cambio de turno (min 50) | ✅ verificado + re-elevación determinística en el borde |
+| Dispatcher sin timeout real | ✅ espera estado terminal o cierre del sim (era `ev.wait(30)`, mataba workers a x6/x1) |
+| `dominio_base()` con TLDs compuestos | ✅ `.com.ar`/`.org.ar`/`.gob.ar`/`.co.uk` (antes colateral masivo) |
+| Bandeja aislada por turno + roles | ✅ juez fuera de turno = solo lectura; operador no ve "archivar"; anti doble-clic; reclamos en hilo propio (no bloquean poller) |
+| **Cadena de custodia ampliada** | ✅ hash cubre `timestamp_iso`+`expediente_id`+`n`; huella SHA-256 por evidencia y por orden citada en cadena; `verificar_cadena.py` las recomputa + chequea cobertura. Tamper test: detecta captura/timestamp/juez alterados |
+| **Cierre de circuito** | ✅ `hilo_cierre`: actuación `vencimiento` + `cerrado`/`archivo`/`cerrado_min` a fin+5 de gracia |
+| Detalle peritaje + evidencia + badge | ✅ "por qué esta medida" en humano, `captura_meta` (formato/duración/página), promo con URL completa, sello `✓ cadena íntegra` |
+| Bandeja ágil (velocidad) | ✅ beep + banner + atajo `A` cuando hay pendientes de firma |
 | Race condition `expedientes.id` entre workers | ✅ fix: `db.bloqueo()` en `obtener_o_crear` |
-| Video ≤ 3 min | ⬜ Pendiente (Hito 4) |
-| README de cómo correr (exigencia de entrega) | ⬜ Pendiente — adaptar sección 3 de este archivo |
+| README + propuesta normativa (7 puntos) | ✅ actualizados (interactivo = partido final; auto = solo pruebas internas) |
+| Video ≤ 3 min | ⬜ Pendiente (guion: `GRABAR-VIDEO.md`) |
+| Repo público propio + push | ⬜ Pendiente |
 
 ---
 
@@ -37,26 +41,28 @@ set PYTHONUTF8=1
 python simulador/servidor.py --escenario datos/escenario_practica.json --acelerar 6
 
 # Terminal 2 — plataforma (desde la carpeta desafio-futbol/)
-python -m plataforma.main --modo auto --reset          # auto-firma (orden marco)
-python -m plataforma.main --modo interactivo --reset   # el juez aprueba en la web
+python -m plataforma.main --modo interactivo --reset   # PARTIDO FINAL: el juez aprueba en la web
+python -m plataforma.main --modo auto --reset          # solo pruebas internas
 # Consola judicial: http://127.0.0.1:8090 — clave 'demo' para todos:
 #   jueces laura/martin (firman solo de turno), secretario, operador, admin.
 # Público: /transparencia, /reclamar, /monitor
 
 # Terminal 3 — cuando el sim llega a fin_min + 5 de gracia:
 python evaluacion/verificar.py --log salida/registro.jsonl
+python -m plataforma.auditoria.verificar_cadena        # cadena en DB viva
+python -m plataforma.main --exportar                   # escribe entrega/
 ```
 
 Flags útiles: `--acelerar 60` (partido en ~2 min para iterar), `--inicio-min 45`
 (probar el cambio de turno), `--inicio-min 40`, `--sin-ui`, `--exportar`
 (exporta `entrega/` y sale), `--servidor URL`.
 
-**Test de reclamos**: `python test_reclamo.py` (con plataforma en modo
-`interactivo`) — loguea como la jueza Laura y pulsa "forzar IP" sobre el
-expediente de `tv.verpartido-hd.test` (IP compartida) → genera colateral real →
-los reclamos automáticos → levantamiento firmado + reemplazo por dominio.
-Es la forma de DEMOSTRAR reclamos en el video: jugando perfecto el sim
-**nunca emite reclamos** (ver quirks abajo).
+**Test del circuito interactivo**: `python scripts/juez_click.py --forzar-ip
+tv.verpartido-hd.test` (con plataforma en `interactivo`) — hace login como el
+juez de turno, aprueba expedientes elevados, hace lugar a reclamos y re-loguea
+al entrante en el cambio de turno. `scripts/test_reclamo.py` hace solo el
+`forzar-ip` (provoca colateral → reclamos → demo del circuito de levantamiento).
+Jugando perfecto el sim **nunca emite reclamos** (ver quirks abajo).
 
 ---
 
@@ -69,8 +75,12 @@ config.py              Constantes + usuarios demo por rol (juez laura/martin,
                        default http://127.0.0.1:8080
 cliente_sim.py         Cliente HTTP (urllib). Fuerza localhost→127.0.0.1 (ver quirks)
 db.py                  SQLite única + lock global + WAL + synchronous=OFF.
-                       actuacion(): append-only con hash encadenado por expediente.
-                       expedientes.dependencia: circuito pericia→secretaria→juzgado→despacho→archivo
+                       actuacion(): append-only; hash = sha256(hash_prev|exp_id|
+                       n|tipo|detalle|minuto|timestamp_iso). huella_evidencia/
+                       huella_orden: sha256 canónico de cada fila probatoria,
+                       citado dentro de la cadena (actuación 'evidencia' /
+                       'firma_orden'). Columnas nuevas: expedientes.aprobada_por/
+                       aprobada_min, evidencias.captura_meta/huella, ordenes.huella.
 motor/reloj.py         Cachea /estado y extrapola el minuto entre polls (usa `acelerar`).
 motor/turnos.py        esperar_firma_segura(): si falta < MARGEN_TURNO_MIN (0.6)
                        para el fin del turno, duerme hasta el borde y devuelve
@@ -78,14 +88,23 @@ motor/turnos.py        esperar_firma_segura(): si falta < MARGEN_TURNO_MIN (0.6)
                        reintentos y levantamientos de reclamos).
 motor/verificador.py   clasificar(): pirata / licenciatario / descartada.
                        analizar_colateral(): dns-pasivo → ip|dominio.
-motor/expediente.py    Un expediente por tupla (host_stream, ip_servidor).
+                       dominio_base(): TLDs compuestos (.com.ar, .co.uk...).
+motor/expediente.py    Un expediente por tupla (host_stream, ip_servidor);
+                       juez_asignado al crear. agregar_evidencia() guarda
+                       captura_meta + huella y asienta actuación 'evidencia'.
 motor/poller.py        Thread fetch (/estado,/detecciones,/reclamos cada 0.5 s)
                        + cola + 4 workers en paralelo + lock por tupla.
+                       Reclamos van a Thread-Reclamos (no bloquean detecciones).
 motor/dispatcher.py    Worker por (expediente, proveedor): firma → POST →
-                       espera confirmación. Monitor CONSOLIDADO: 4 GET/ciclo
-                       (lista completa por proveedor), no uno por orden.
-motor/reclamos.py      Ubica la orden aplicada que afecta el dominio reclamado,
-                       la levanta firmada y despacha reemplazo por dominio.
+                       espera confirmación SIN timeout real fijo. La firma usa
+                       el juez de expedientes.aprobada_por si sigue de turno;
+                       si no, re-eleva (estado elevado + juez_asignado nuevo)
+                       y espera la aprobación del entrante. Monitor
+                       CONSOLIDADO: 4 GET/ciclo, no uno por orden.
+motor/reclamos.py      Reclamo → estado 'elevado' en la bandeja del juez de
+                       turno (interactivo); resolver() con el juez_id de
+                       sesión: firma LEVANTAR + reemplazo por dominio
+                       (orden_id 'rep'). En auto resuelve directo.
 juez/servidor_ui.py    ThreadingHTTPServer: login por roles (cookie), bandeja
                        con dependencia, detalle con acciones por rol (aprobar/
                        forzar-ip/rechazar/pase/revision/archivar), informe
@@ -97,8 +116,12 @@ auditoria/exportar.py  entrega/expediente-ejemplo.json + registro-auditoria.json
 datos_app/plataforma.db  SSOT (se crea sola; --reset la borra)
 ```
 
-Modos: `auto` = firma inmediata tras peritaje (la "orden marco": narrativa para
-el pitch). `interactivo` = queda `elevado` hasta que el juez apruebe en la web.
+Modos: `interactivo` (default, partido final) = queda `elevado` hasta que el
+juez de turno apruebe en la web — la firma solo puede hacerla quien clickeó.
+`auto` = firma inmediata tras peritaje, SOLO para pruebas internas (la "orden
+marco" es el punto 1 de la propuesta normativa, no un atajo del MVP).
+`hilo_cierre` (main.py): al llegar a fin+5 de gracia asienta 'vencimiento' en
+cada expediente y los pasa a cerrado/archivo/cerrado_min.
 
 ---
 
@@ -153,13 +176,15 @@ el pitch). `interactivo` = queda `elevado` hasta que el juez apruebe en la web.
 
 ## 5. Resultados de corridas verificadas
 
-**×60 desde min 0 (vie 13, post-fix race):**
+**×60 desde min 0, modo INTERACTIVO + juez_click --forzar-ip (vie 13, post-auditoría):**
 ```
-fases_piratas_bloqueadas: 7 de 7     visibilidad_residual: 5.6 %
-primer bloqueo por fase: 0.5–5.5 min   clientes cubiertos: 100 % todas
+fases_piratas_bloqueadas: 7 de 7     visibilidad_residual: 7.3 %
+primer bloqueo por fase: 0.6–7.2 min   clientes cubiertos: 100 % todas
 colateral/falsos_positivos/rechazos/fuera_de_turno/ip_post_partido: 0
-ordenes: 30 recibidas / 28 aplicadas / 2 fallidas (Cumbre, reintentos r1 OK)
-reclamos (test forzado): 3/3 levantados firmados en <0.5 min
+ordenes: 33 recibidas / 31 aplicadas / 2 fallidas (Cumbre, reintentos rep OK)
+reclamos: 3/3 elevados a bandeja → "hacer lugar" del juez → levantados <1 min
+cadena de custodia: INTEGRIDAD OK — 180 actuaciones, 38 evidencias, 33 órdenes
+expedientes: los 7 → cerrado/archivo/cerrado_min=110.015 (vencimiento asentado)
 ```
 
 **Smoke interactivo + reclamos (vie 13, post-fix race):** modo `interactivo`
@@ -182,25 +207,32 @@ controlable quedó en cero y el cambio de turno (min 50) anduvo perfecto:
 
 ---
 
-## 6. Pendiente (Hito 3–4, viernes 13)
+## 6. Pendiente (Hito 4, viernes 13)
 
-- [ ] **Video ≤ 3 min**: corrida de práctica. Guión en PLAN.md §8.3. Incluir el
-      truco "forzar IP" para mostrar un reclamo resuelto.
-- [ ] **README del repo**: cómo correr, supuestos, qué código existía antes
-      (stdlib puro, sin deps). Reusar secciones 2–4 de este archivo.
+- [ ] **Video ≤ 3 min**: corrida de práctica en interactivo. Guión:
+      `GRABAR-VIDEO.md` — login laura, aprobación 1 clic, Cumbre reintenta,
+      cambio de turno min 50, forzar-ip → reclamo → "hacer lugar" firmado,
+      verificar.py + verificar_cadena.py.
+- [ ] **Repo público propio**: `git fetch` de origin (qualydata-org) ya hecho;
+      crear repo público bajo la cuenta del participante y pushear; NO pushear
+      al repo de la organización.
 - [x] Regenerar `entrega/expediente-ejemplo.json` + `registro-auditoria.json`
-      (`--exportar` tras la corrida 7/7 del vie 13).
-- [ ] Pulir UI si sobra tiempo (prioridad baja vs. motor).
-- [x] Probar `--inicio-min 40` completo (ver §5: 6/7 estructural, no bug).
-- [ ] Commits periódicos + repo público para Hacki; congelar al cierre.
+      (`--exportar` tras la corrida 7/7 interactiva del vie 13 — nueva cadena).
+- [x] README: modo interactivo como partido final + archivos propios documentados.
+- [x] Propuesta normativa: 7 puntos (agregados transparencia/custodia y turno
+      judicial; plazos alineados a los 5 min de gracia del sim).
+- [ ] Commits periódicos + congelar al cierre (viernes 13:00).
 
 ## 7. Decisiones de diseño ya tomadas (no reabrir sin motivo)
 
 - Cero dependencias externas (stdlib) — portabilidad garantizada día 3.
 - SQLite única con lock global (carga baja, cero problemas de concurrencia).
 - Dispatcher con un thread por (expediente, proveedor) + monitor consolidado.
-- Auto-firma como "orden marco judicial" (propuesta normativa #2) — la demo y
-  el pitch quedan alineados; el modo interactivo existe para el video.
+- **Interactivo = modo del partido final** (regla de la org: el juez inicia
+  sesión y aprueba; nadie firma en su nombre). `auto` queda para pruebas
+  internas; la "orden marco" vive en la propuesta normativa (punto 1).
+- Firma ligada al clic: `expedientes.aprobada_por`; si el aprobante sale de
+  turno antes de despachar, el expediente se re-eleva al entrante.
 - Estructura de archivos como en PLAN.md §3; `plataforma/datos_app/juzgados_local.json`
   no se duplicó: se lee `datos/juzgados.json` directo (las claves finales son
   las mismas según README del desafío).

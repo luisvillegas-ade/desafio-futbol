@@ -87,15 +87,17 @@ http://127.0.0.1:8090/reclamar
 ```
 
 4. Escribí `panaderia-la-espiga.test` en el dominio → **Enviar reclamo**.
-5. Volvé al **Monitor**: en el log aparece `[reclamos]` y el contador
-   `reclamos 1` — el sistema levantó el bloqueo con firma judicial y lo
-   reemplazó por uno preciso por dominio.
+5. Volvé a la **Consola**: el reclamo aparece arriba en la bandeja del juez
+   como pendiente → apretá **"Hacer lugar: levantar y reemplazar"**.
+   El juez firma el levantamiento con su clave y el sistema despacha el
+   reemplazo por dominio. (En el Monitor se ve `[reclamos]` en el log.)
 
 Decí:
 
 > *"Si el bloqueo se pasa de largo, hay remedio. El ciudadano reclama sin
-> login, el juez levanta la medida firmado y el sistema la reemplaza por
-> una más precisa. Debido proceso — no censura."*
+> login, el reclamo llega a la bandeja del juez de turno y con un clic él
+> firma el levantamiento — el sistema lo reemplaza por una medida más
+> precisa. Debido proceso — no censura."*
 
 ---
 
@@ -110,13 +112,15 @@ cd C:\Proyectos-Hackatones\argentinaSpace\desafio-futbol
 python -m plataforma.auditoria.verificar_cadena
 ```
 
-3. Muestra: `INTEGRIDAD OK — N actuaciones verificadas`.
+3. Muestra: `INTEGRIDAD OK — N actuaciones, M evidencias y K órdenes
+   verificadas`.
 
 Decí:
 
-> *"Resultado: 7 de 7 fases bloqueadas, cero daño colateral, cero firmas
-> fuera de turno. Y la cadena de custodia es verificable por cualquiera —
-> tocás una foja y el auditor te dice exactamente cuál está trucada."*
+> *"Resultado: 7 de 7 fases bloqueadas, cero falsos positivos, cero firmas
+> fuera de turno. Y la cadena de custodia cubre hasta las capturas y cada
+> orden firmada — tocás una foja o una captura y el auditor te dice
+> exactamente cuál está trucada."*
 
 ---
 

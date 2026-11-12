@@ -33,11 +33,16 @@ def exportar() -> None:
         print(f"  entrega/expediente-ejemplo.json  ({exp['id']})")
 
     registro = {
-        "cadena_de_custodia": "hash_actual = sha256(hash_prev|tipo|detalle|minuto)",
+        "cadena_de_custodia": (
+            "hash_actual = sha256(hash_prev|expediente_id|n|tipo|detalle|"
+            "minuto|timestamp_iso); cada evidencia y cada orden lleva una "
+            "huella SHA-256 canónica citada en la cadena — recomputar con "
+            "python -m plataforma.auditoria.verificar_cadena <este archivo>"),
         "actuaciones": [dict(x) for x in db.q(
             "SELECT * FROM actuaciones ORDER BY id")],
         "reclamos": [dict(x) for x in db.q("SELECT * FROM reclamos ORDER BY minuto")],
         "ordenes": [dict(x) for x in db.q("SELECT * FROM ordenes ORDER BY id")],
+        "evidencias": [dict(x) for x in db.q("SELECT * FROM evidencias")],
     }
     (config.ENTREGA_DIR / "registro-auditoria.json").write_text(
         json.dumps(registro, ensure_ascii=False, indent=2), encoding="utf-8")

@@ -22,15 +22,29 @@ Toda medida debe ser precedida de una **verificación de coexistencia** (DNS pas
 
 ## 4. Vencimiento de pleno derecho
 
-Toda restricción por dirección IP **vence automáticamente transcurridos 15 minutos de finalizado el evento deportivo**, sin necesidad de orden judicial adicional. Los bloqueos por dominio pueden subsistir solo si la orden marco lo autoriza expresamente y por plazo cierto. El registro público muestra estado y fecha de expiración de cada medida.
+Toda restricción por dirección IP **vence automáticamente al finalizar el evento deportivo** (con una ventana técnica de gracia —en el simulador, 5 minutos— para que los proveedores asienten el levantamiento), sin necesidad de orden judicial adicional. Los bloqueos por dominio pueden subsistir solo si la orden marco lo autoriza expresamente y por plazo cierto. El registro público muestra estado y fecha de expiración de cada medida.
 
 **Por qué:** un bloqueo residual es censura sin causa vigente; el vencimiento automático elimina el riesgo de "órdenes olvidadas" y da previsibilidad a los proveedores.
 
-## 5. Procedimiento sumario digital de reclamos
+## 5. Transparencia y cadena de custodia verificable
+
+Cada actuación del circuito (detección, peritaje, firma, despacho, confirmación, levantamiento, vencimiento) queda asentada como **foja numerada encadenada criptográficamente**: `sha256(hash_prev|expediente|foja|tipo|detalle|minuto|timestamp)`. La evidencia (capturas, DNS pasivo) y cada orden librada llevan **huella SHA-256 propia citada dentro de la cadena**. El juzgado debe publicar además un **registro público de transparencia** en tiempo real: qué se bloqueó, cuándo, por orden de quién y hasta cuándo.
+
+**Por qué:** la integridad de la evidencia no puede descansar en la palabra del operador de la plataforma — cualquier perito, la defensa o un auditor debe poder recomputar la cadena de forma independiente y detectar si una foja o una captura fue retocada. La transparencia pública es el contrapeso democrático de un poder de censura ejecutado en minutos.
+
+## 6. Procedimiento sumario digital de reclamos
 
 Todo titular de un sitio afectado puede reclamar por **vía digital sumarísima** (formulario/API pública). La plataforma debe elevar el reclamo al juez de turno y la medida debe resolverse en un **plazo máximo de 15 minutos**: si el afectado es ajeno al infractor, se dispone el levantamiento inmediato y, cuando corresponda, su reemplazo por una medida más precisa sobre el objetivo real.
 
 **Por qué:** sin vía rápida de reparación, el daño colateral se convierte en irreparable y el sistema pierde legitimidad. El plazo corto es viable justamente porque todo el circuito ya es digital y trazable.
+
+---
+
+## 7. Turno judicial continuo con firma personal
+
+La plataforma debe operar con **jueces de turno identificados**: cada magistrado ingresa con su propio usuario y firma solo mientras está de turno; nadie —ni la fiscalía, ni el sistema— firma en su nombre. Al cambio de turno, los expedientes pendientes pasan automáticamente al juez entrante y el saliente pierde la capacidad de firma. Si una aprobación queda en el borde del turno, se re-eleva al entrante.
+
+**Por qué:** la firma digital del juez es el acto que habilita la injerencia estatal; delegarla a un proceso automático vaciaría la garantía judicial. Los turnos son la única forma realista de sostener control humano durante un evento de dos horas sin agotar a una sola persona.
 
 ---
 

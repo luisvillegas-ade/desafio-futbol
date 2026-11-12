@@ -42,7 +42,9 @@ CREATE TABLE IF NOT EXISTS evidencias (
     marca_valida INTEGER,
     dominios_en_ip TEXT,                 -- JSON array del DNS pasivo
     promocion TEXT,                      -- JSON: canales de difusión (X/Telegram/Discord)
-    riesgo_colateral_detectado INTEGER
+    riesgo_colateral_detectado INTEGER,
+    captura_meta TEXT,                   -- JSON: formato/duracion/pagina de la captura
+    huella TEXT                          -- sha256 canónico de la fila probatoria
 );
 
 CREATE TABLE IF NOT EXISTS actuaciones (
@@ -68,6 +70,7 @@ CREATE TABLE IF NOT EXISTS ordenes (
     juzgado_id TEXT,
     juez_id TEXT,
     firma TEXT,
+    huella TEXT,                         -- sha256 canónico de la fila (firma+juez+objeto)
     estado TEXT,                         -- recibida|aplicada|fallida|vencida|levantada
     intento INTEGER DEFAULT 0,
     minuto_envio REAL,
@@ -116,6 +119,23 @@ def conectar() -> sqlite3.Connection:
         if "dependencia" not in cols_e:
             _conn.execute("ALTER TABLE expedientes ADD COLUMN dependencia "
                           "TEXT DEFAULT 'pericia'")
+        if "aprobada_por" not in cols_e:
+            _conn.execute("ALTER TABLE expedientes "
+                          "ADD COLUMN aprobada_por TEXT")
+        if "aprobada_min" not in cols_e:
+            _conn.execute("ALTER TABLE expedientes "
+                          "ADD COLUMN aprobada_min REAL")
+        cols_v = [r["name"] for r in
+                  _conn.execute("PRAGMA table_info(evidencias)")]
+        if "captura_meta" not in cols_v:
+            _conn.execute("ALTER TABLE evidencias "
+                          "ADD COLUMN captura_meta TEXT")
+        if "huella" not in cols_v:
+            _conn.execute("ALTER TABLE evidencias ADD COLUMN huella TEXT")
+        cols_o = [r["name"] for r in
+                  _conn.execute("PRAGMA table_info(ordenes)")]
+        if "huella" not in cols_o:
+            _conn.execute("ALTER TABLE ordenes ADD COLUMN huella TEXT")
     return _conn
 
 
@@ -152,10 +172,31 @@ def cursor_set(clave: str, valor: float) -> None:
         "ON CONFLICT(clave) DO UPDATE SET valor=excluded.valor", (clave, valor))
 
 
+def huella_evidencia(e) -> str:
+    """Digest canónico de una fila de `evidencias`: cubre la captura (vía su
+    sha256) y todos los campos probatorios. Se referencia en la actuación
+    'evidencia' para que la cadena cubra también la evidencia."""
+    return hashlib.sha256("|".join(str(e[k]) for k in (
+        "expediente_id", "deteccion_id", "minuto", "stream_url",
+        "captura_sha256", "marca_extraida", "marca_valida", "dominios_en_ip",
+        "promocion", "riesgo_colateral_detectado")).encode()).hexdigest()
+
+
+def huella_orden(o) -> str:
+    """Digest canónico de una fila de `ordenes`: cubre firma, juez firmante,
+    objetivo y plazo. Se referencia en la actuación 'firma_orden'/'despacho'."""
+    return hashlib.sha256("|".join(str(o[k]) for k in (
+        "orden_id", "expediente_id", "proveedor_id", "tipo", "objetivo",
+        "vence_min", "juzgado_id", "juez_id", "firma")).encode()).hexdigest()
+
+
 def actuacion(expediente_id, tipo: str, detalle: str, minuto: float) -> str:
     """Append-only: cada actuación encadena el hash de la anterior del expediente.
 
     expediente_id=None usa la cadena 'SISTEMA' (eventos de plataforma).
+    hash = sha256(hash_prev | expediente_id | n | tipo | detalle | minuto |
+                  timestamp_iso) — cubre también el timestamp y el propio
+    número de foja, así reordenar o retocar metadatos rompe la cadena.
     """
     with _lock, conectar() as c:
         prev = c.execute(
@@ -163,9 +204,13 @@ def actuacion(expediente_id, tipo: str, detalle: str, minuto: float) -> str:
             "ORDER BY n DESC LIMIT 1", (expediente_id,)).fetchone()
         n = (prev["n"] + 1) if prev else 1
         hprev = prev["hash_actual"] if prev else "GENESIS"
-        h = hashlib.sha256(f"{hprev}|{tipo}|{detalle}|{minuto}".encode()).hexdigest()
+        ts = iso()
+        clave = expediente_id or "SISTEMA"
+        h = hashlib.sha256(
+            f"{hprev}|{clave}|{n}|{tipo}|{detalle}|{minuto}|{ts}"
+            .encode()).hexdigest()
         c.execute(
             "INSERT INTO actuaciones(expediente_id,n,tipo,detalle,minuto,timestamp_iso,"
             "hash_prev,hash_actual) VALUES(?,?,?,?,?,?,?,?)",
-            (expediente_id, n, tipo, detalle, minuto, iso(), hprev, h))
+            (expediente_id, n, tipo, detalle, minuto, ts, hprev, h))
         return h

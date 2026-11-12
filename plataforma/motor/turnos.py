@@ -29,6 +29,29 @@ class Turnos:
                 return t, jz, j
         return None, None, None
 
+    def juez_seguro(self, minuto: float = None,
+                    margen: float = config.MARGEN_TURNO_MIN):
+        """Quién podría firmar ahora sin riesgo de quedar fuera de turno.
+
+        Devuelve (turno, juzgado, juez): el juez de turno si falta más que
+        `margen` para el fin de su turno; si ya está dentro del buffer, el
+        juez ENTRANTE (es el único cuya firma llegará vigente al proveedor);
+        (None, None, None) si no hay nadie ahora ni después.
+        """
+        ahora = self.reloj.ahora() if minuto is None else minuto
+        t, jz, j = self.de_turno(ahora)
+        if t and ahora < t["hasta_min"] - margen:
+            return t, jz, j
+        proximos = [x["desde_min"] for x in self.turnos
+                    if x["desde_min"] > ahora]
+        if proximos:
+            return self.de_turno(min(proximos) + 1e-6)
+        return None, None, None
+
+    def juez_por_id(self, juez_id: str):
+        """(juzgado, juez) para un id de juez, o (None, None)."""
+        return self.jueces.get(juez_id, (None, None))
+
     def esperar_firma_segura(self, margen: float = config.MARGEN_TURNO_MIN):
         """Espera hasta que sea seguro firmar y devuelve (turno, juzgado, juez).
 

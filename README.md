@@ -17,13 +17,20 @@ Una plataforma en **Python 3.9+ estándar, cero dependencias externas**, que cor
 ```powershell
 python demo.py                  # interactivo (usted es el juez) a x6 (~17 min)
 python demo.py --acelerar 60    # ~2 min, para iterar
-python demo.py --modo auto      # firma automática, corre solo
+python demo.py --modo auto      # solo para pruebas internas (ver nota abajo)
 ```
 
-Arranca simulador + plataforma, abre el navegador en la consola judicial y,
-al terminar el partido (más los 5 min de gracia), corre `verificar.py` y
-muestra el puntaje. Si los puertos 8080/8090 están ocupados por corridas
-viejas, pregunta si los frena.
+`demo.py` arranca simulador + plataforma, abre el navegador en la consola
+judicial y, al terminar el partido (más los 5 min de gracia), corre
+`verificar.py` y muestra el puntaje. Si los puertos 8080/8090 están ocupados
+por corridas viejas, pregunta si los frena. `JUGAR.bat` es el atajo de
+doble click: misma función, acepta los mismos flags (`JUGAR.bat --acelerar 60`).
+
+**Modo de ejecución:** `--modo interactivo` es el modo por defecto y el del
+partido final: el juez inicia sesión y **aprueba con un clic** cada orden —
+nadie firma en su nombre (regla del enunciado). `--modo auto` queda como
+herramienta de pruebas internas: firma sin intervención humana bajo la
+narrativa de "orden marco" de la propuesta normativa.
 
 **Manual** (tres terminales):
 
@@ -32,9 +39,8 @@ viejas, pregunta si los frena.
 $env:PYTHONUTF8=1; python simulador/servidor.py --escenario datos/escenario_practica.json --acelerar 6
 
 # Terminal 2 — plataforma (desde la raíz del repo)
-python -m plataforma.main --modo auto --reset          # auto-firma (orden marco judicial)
 python -m plataforma.main --modo interactivo --reset   # el juez aprueba cada orden en la web
-python -m plataforma.main --modo auto --reset --servidor http://<ip>:8080   # partido final
+python -m plataforma.main --modo interactivo --reset --servidor http://<ip>:8080   # partido final
 
 # Consola judicial: http://127.0.0.1:8090  (clave demo para todos)
 #   Jueces:     laura / martin   (firman solo estando de turno)
@@ -48,9 +54,20 @@ python -m plataforma.main --modo auto --reset --servidor http://<ip>:8080   # pa
 # Terminal 3 — cuando el partido termina (+5 min de gracia)
 python evaluacion/verificar.py --log salida/registro.jsonl
 
+# Cadena de custodia (verificable sin confiar en la plataforma):
+python -m plataforma.auditoria.verificar_cadena                          # DB viva
+python -m plataforma.auditoria.verificar_cadena entrega/registro-auditoria.json
+
 # Exportar los entregables del día 3
 python -m plataforma.main --exportar   # escribe entrega/expediente-ejemplo.json y registro-auditoria.json
 ```
+
+**Pruebas automatizadas del circuito interactivo** (no hace falta clickear a
+mano para iterar): `python scripts/juez_click.py --forzar-ip tv.verpartido-hd.test`
+hace login como el juez de turno, aprueba los expedientes elevados, hace lugar
+a los reclamos de la bandeja y re-loguea al juez entrante en el cambio de turno.
+`scripts/test_reclamo.py` hace solo el paso de `forzar-ip` sobre el expediente
+de IP compartida para provocar los reclamos de la demo.
 
 Flags de la plataforma: `--modo auto|interactivo` · `--servidor URL` · `--reset` (borra la BD) · `--sin-ui` · `--exportar` · `--puerto-ui`.
 
@@ -62,33 +79,48 @@ Flags útiles del simulador: `--acelerar 60` (partido en ~2 min para iterar) · 
 2. **Expediente digital** (`motor/expediente.py` + `db.py`): un expediente por tupla `(host_stream, ip_servidor)`; un cambio de IP/host abre una ampliación cautelar (fase nueva del mismo stream). Cada actuación se numera y encadena con hash SHA-256 (cadena de custodia, append-only).
 3. **Regla IP vs. dominio:** si la IP aloja dominios ajenos al infractor (CDN/hosting compartido) → orden por `dominio`; si es dedicada → orden por `ip`. Si el DNS pasivo no responde, se elige `dominio` (nunca genera daño colateral).
 4. **Firma judicial con turnos** (`motor/turnos.py`): si falta menos de ~0.6 min para el fin del turno (cambio en el minuto 50), la firma espera al borde y la orden sale firmada por el juez entrante — cero órdenes fuera de turno.
-5. **Despacho paralelo y reintentos** (`motor/dispatcher.py`): un worker por `(expediente, proveedor)`; monitor consolidado (4 consultas por ciclo, no una por orden). FibraValle solo acepta `dominio` — se traduce la orden para ese proveedor. Las fallas de Cumbre (~35 %) se reintentan con `orden_id` nuevo (`ord-<exp>-<prov>-r<n>`) y firma recalculada.
-6. **Reclamos** (`motor/reclamos.py`): polling de `/reclamos`; ubica la orden activa que afecta al dominio reclamado, la levanta con firma judicial y despacha un reemplazo por `dominio` más preciso.
-7. **Consola judicial por roles** (`juez/`): el expediente circula por dependencias `pericia → secretaría → juzgado → despacho → archivo` y cada pase queda asentado como actuación `pase` en la cadena de custodia. El juez firma solo estando de turno; secretaría y fiscalía hacen pases, devuelven a revisión técnica y archivan; el admin ve todo. Botones: aprobar / forzar-IP / rechazar / **iniciar revisión** (re-peritaje en vivo) / archivar / **emitir informe** imprimible (`/exp/<id>/informe`). Superficies públicas: `/transparencia`, `/reclamar` (procedimiento sumario digital) y `/monitor` (tablero TUI en vivo). En `--modo auto` la firma es inmediata (orden marco: la narrativa de nuestra propuesta normativa).
+5. **Despacho paralelo y reintentos** (`motor/dispatcher.py`): un worker por `(expediente, proveedor)`; monitor consolidado (4 consultas por ciclo, no una por orden). FibraValle solo acepta `dominio` — se traduce la orden para ese proveedor. Las fallas de Cumbre (~35 %) se reintentan con `orden_id` nuevo (`ord-<exp>-<prov>-rep<n>-r<i>`) y firma recalculada con el juez que aprobó si sigue de turno; si no, el expediente se re-eleva al entrante. La espera de confirmación no tiene timeout real fijo: aguanta hasta el estado terminal o el cierre del simulador.
+6. **Reclamos** (`motor/reclamos.py`): polling de `/reclamos` en hilo propio (no bloquea el feed de detecciones). Ubica la orden activa que afecta al dominio reclamado y, en modo interactivo, **la eleva a la bandeja del juez de turno**: con un clic ("hacer lugar") el juez firma el levantamiento y la plataforma despacha el reemplazo por `dominio` más preciso.
+7. **Consola judicial por roles** (`juez/`): el expediente circula por dependencias `pericia → secretaría → juzgado → despacho → archivo` y cada pase queda asentado como actuación `pase` en la cadena de custodia. El juez firma solo estando de turno y la firma queda ligada a **su** clic (`aprobada_por`): si aprobó cerca del borde del turno, el expediente se re-eleva al juez entrante y espera su aprobación — nadie firma en nombre de otro. Secretaría y fiscalía hacen pases, devuelven a revisión técnica y archivan; el admin ve todo. Botones: aprobar / forzar-IP / rechazar / **iniciar revisión** (re-peritaje en vivo) / archivar / **emitir informe** imprimible (`/exp/<id>/informe`). La bandeja avisa con alerta sonora, banner y el atajo `A` cuando hay actuaciones esperando firma. Superficies públicas: `/transparencia`, `/reclamar` (procedimiento sumario digital) y `/monitor` (tablero en vivo).
 
 ### Resultados en el escenario de práctica
 
-`verificar.py` sobre la última corrida completa (desde minuto 0, aceleración ×60):
+`verificar.py` sobre la última corrida completa **en modo interactivo**
+(desde minuto 0, aceleración ×60, incluyendo la demo de reclamos con
+`forzar-ip` sobre la IP compartida):
 
 ```
-fases piratas bloqueadas: 7 de 7      visibilidad residual: 5,6 %
-clientes cubiertos: 100 % en todas las fases   (primer bloqueo: 0,5–5,5 min)
-daño colateral / falsos positivos / rechazos / fuera de turno / IP post-partido: 0
-reclamos (provocados para la demo): 3/3 levantados firmados en < 0,5 min
+fases piratas bloqueadas: 7 de 7      visibilidad residual: 7,3 %
+clientes cubiertos: 100 % en todas las fases   (primer bloqueo: 0,6–7,2 min)
+falsos positivos / rechazos / órdenes fuera de turno / IP activas post-partido: 0
+reclamos (provocados para la demo): 3/3 levantados firmados en < 1 min
+colateral de la demo: 3 bloqueos IP sobre 4 sitios legítimos, todos levantados
+cadena de custodia: ÍNTEGRA (180 actuaciones, 38 evidencias, 33 órdenes)
+expedientes: los 7 cerrados a 'archivo' al vencer la ventana (min 105 + gracia)
 ```
 
 ### Supuestos y decisiones de diseño
 
 - **SQLite única como SSOT** (`plataforma/datos_app/plataforma.db`) con un lock global: la carga es baja y elimina cualquier problema de concurrencia.
-- **`vence_min` entero = `fin_min` del partido**: los bloqueos por IP vencen solos al terminar (propuesta normativa, punto 4).
-- **Auto-firma = orden marco judicial**: en `modo auto` el juzgado libró una orden marco que autoriza a la plataforma a incorporar objetivos verificados pericialmente durante el evento; el modo `interactivo` existe para demostrar la firma manual en la consola.
+- **`vence_min` entero = `fin_min` del partido**: los bloqueos por IP vencen solos al terminar (propuesta normativa, punto 4). Al vencer la ventana (fin + 5 min de gracia) la plataforma asienta la actuación `vencimiento` en cada expediente y los pasa a `cerrado`/`archivo`.
+- **Firma judicial personal**: en `modo interactivo` la orden solo se firma con la clave del juez que hizo clic aprobando, y solo si sigue de turno con margen seguro; de lo contrario se re-eleva al entrante. `modo auto` queda para pruebas internas (la "orden marco" es un punto de la propuesta normativa, no un atajo del MVP).
 - Las claves de firma se leen de `datos/juzgados.json` (las del material del desafío; no hay secretos reales en el repo).
+- **`dominio_base()` maneja TLDs compuestos** (`.com.ar`, `.org.ar`, `.gob.ar`, `.co.uk`): `panaderia.com.ar` y `pirata.com.ar` no se confunden como mismo operador — sin esto, un CDN argentino generaría daño colateral masivo.
 
-### Entregables
+### Entregables y archivos propios
 
-- `entrega/propuesta-normativa.md` — 1 página, 5 puntos.
+Código escrito durante el hackathon (todo stdlib):
+
+- `plataforma/` — el sistema completo (motor, consola judicial, auditoría).
+- `demo.py` + `JUGAR.bat` — lanzador todo-en-uno (sim + plataforma + navegador + puntaje).
+- `scripts/juez_click.py`, `scripts/test_reclamo.py` — pruebas automatizadas del circuito interactivo y de reclamos.
+- `GRABAR-VIDEO.md` — guion paso a paso del video ≤ 3 min.
+- `AGENTS.md` — bitácora técnica completa (quirks del simulador verificados, arquitectura, resultados).
+
+Entregables del día 3:
+
+- `entrega/propuesta-normativa.md` — 1 página, 7 puntos.
 - `entrega/expediente-ejemplo.json` y `entrega/registro-auditoria.json` — exportados de una corrida real con `--exportar`.
-- Bitácora técnica completa (quirks del simulador verificados, arquitectura, resultados): `AGENTS.md`.
 
 ---
 

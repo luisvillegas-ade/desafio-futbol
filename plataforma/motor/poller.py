@@ -37,12 +37,15 @@ class Poller(threading.Thread):
         self.modo_auto = modo_auto
         self.detener = threading.Event()
         self.cola = queue.Queue()
+        self.cola_reclamos = queue.Queue()
         self._locks = {}          # tupla (host,ip) -> Lock
         self._locks_guard = threading.Lock()
 
         for i in range(TRABAJADORES):
             threading.Thread(target=self._trabajador, daemon=True,
                              name=f"Thread-Trabajo-{i}").start()
+        threading.Thread(target=self._trabajador_reclamos, daemon=True,
+                         name="Thread-Reclamos").start()
 
     def _lock_tupla(self, host: str, ip: str) -> threading.Lock:
         with self._locks_guard:
@@ -78,10 +81,20 @@ class Poller(threading.Thread):
                 if r["id"] in vistos:
                     continue
                 vistos.add(r["id"])
-                self.reclamos.procesar(r)
+                # nunca procesar acá: un levantamiento puede esperar firma y
+                # congelaría el polling de detecciones
+                self.cola_reclamos.put(r)
                 cursor_rec = max(cursor_rec, r["minuto"])
             db.cursor_set("reclamos", cursor_rec)
         return cursor_det, cursor_rec
+
+    def _trabajador_reclamos(self) -> None:
+        while True:
+            r = self.cola_reclamos.get()
+            try:
+                self.reclamos.procesar(r)
+            except Exception as e:
+                print(f"[reclamos] error con {r.get('id')}: {e}", flush=True)
 
     def _trabajador(self) -> None:
         while True:
@@ -105,7 +118,9 @@ class Poller(threading.Thread):
         with lock:
             tipo, objetivo, dominios, ajenos = \
                 self.verificador.analizar_colateral(det)
-            exp, nuevo = ex.obtener_o_crear(det, tipo)
+            _, _, juez = self.turnos.de_turno(self.reloj.ahora())
+            exp, nuevo = ex.obtener_o_crear(
+                det, tipo, juez["id"] if juez else None)
             ex.agregar_evidencia(exp["id"], det, dominios, bool(ajenos), True)
             db.actuacion(
                 exp["id"], "deteccion",

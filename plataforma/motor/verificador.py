@@ -15,8 +15,21 @@ Reglas duras (verificadas contra verificar.py y verdad_practica.json):
 """
 
 
+SUFIJOS_COMPUESTOS = {
+    # segundos niveles reservados donde el dominio registrable tiene 3 etiquetas
+    "com.ar", "net.ar", "org.ar", "gob.ar", "gov.ar", "edu.ar", "mil.ar",
+    "int.ar", "tur.ar", "musica.ar",
+    "co.uk", "org.uk", "ac.uk", "gov.uk",
+    "com.br", "com.mx", "com.co", "com.cl", "com.pe", "com.uy", "com.py",
+    "com.bo", "com.ec", "com.ve", "com.au",
+}
+
+
 def dominio_base(host: str) -> str:
-    partes = host.split(".")
+    """Dominio registrable del host (maneja TLDs compuestos tipo .com.ar)."""
+    partes = host.lower().strip(".").split(".")
+    if len(partes) >= 3 and ".".join(partes[-2:]) in SUFIJOS_COMPUESTOS:
+        return ".".join(partes[-3:])
     return ".".join(partes[-2:]) if len(partes) >= 2 else host
 
 

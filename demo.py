@@ -176,11 +176,24 @@ def main():
                 log(f"  min {e['minuto_actual']:6.1f} / {e['fin_min']:.0f}"
                     f"   juez de turno: {jueces}")
                 ultimo = m
-            # esperar fin del partido + 5 min de gracia para que verificar
-            # pueda evaluar vencimientos post-partido
-            if e["minuto_actual"] >= e["fin_min"] + 5:
+            # esperar fin del partido + gracia (el sim redondea minuto_actual
+            # a 2 decimales: +0.2 evita cortar justo antes de 'ventana_cerrada')
+            if e["minuto_actual"] >= e["fin_min"] + 5.2:
                 break
             time.sleep(1)
+
+        # el sim graba 'ventana_cerrada' en el JSONL recién al superar
+        # fin+gracia: esperar a que quede escrito antes de evaluar
+        reg = log_dir / "registro.jsonl"
+        t0 = time.time()
+        while time.time() - t0 < 10:
+            try:
+                if "ventana_cerrada" in reg.read_text(encoding="utf-8",
+                                                      errors="replace"):
+                    break
+            except Exception:
+                pass
+            time.sleep(0.3)
 
         log("\n[demo] partido terminado — evaluando...\n")
         subprocess.run([sys.executable, "evaluacion/verificar.py",

@@ -71,7 +71,8 @@ text-overflow:ellipsis;padding:1px 0}
 
 AGENTE = {
     "deteccion": "deteccion", "deteccion_descartada": "deteccion",
-    "peritaje": "peritaje", "revision": "peritaje", "dictamen": "juez",
+    "peritaje": "peritaje", "revision": "peritaje", "evidencia": "peritaje",
+    "dictamen": "juez",
     "pase": "mesa", "despacho": "despacho", "confirmacion": "isps",
     "reclamo": "reclamos", "levantamiento": "reclamos",
     "plataforma_iniciada": "sistema", "cambio_turno": "plazos",
@@ -119,9 +120,12 @@ def frag_header(reloj, turnos, modo) -> str:
     n_ord_act = db.q1("SELECT COUNT(*) c FROM ordenes WHERE estado IN "
                       "('recibida','aplicada')")["c"]
     n_rec = db.q1("SELECT COUNT(*) c FROM reclamos")["c"]
-    acts = db.q("SELECT expediente_id,n,tipo,detalle,minuto,hash_prev,"
-                "hash_actual FROM actuaciones ORDER BY id")
-    ok_cadena, _ = verificar(acts)
+    acts = [dict(a) for a in db.q(
+        "SELECT expediente_id,n,tipo,detalle,minuto,timestamp_iso,hash_prev,"
+        "hash_actual FROM actuaciones ORDER BY id")]
+    evs = [dict(e) for e in db.q("SELECT * FROM evidencias")]
+    ords = [dict(o) for o in db.q("SELECT * FROM ordenes")]
+    ok_cadena, _ = verificar(acts, evs, ords)
     estado = ("<span class=mint>■ FINALIZADO</span>" if reloj.finalizado
               else "<span class=mint>● EN VIVO</span>")
     cadena = ("<span class=mint>✓ cadena íntegra</span>" if ok_cadena
@@ -195,7 +199,9 @@ def frag_grafo(reloj, turnos, modo, poller) -> str:
     n_det = c.get("deteccion", 0) + c.get("deteccion_descartada", 0)
     cola = poller.cola.qsize() if poller else 0
     n_ord = db.q1("SELECT COUNT(*) c FROM ordenes")["c"]
-    n_apl = db.q1("SELECT COUNT(*) c FROM ordenes WHERE estado='aplicada'")["c"]
+    n_apl = db.q1("SELECT COUNT(*) c FROM ordenes WHERE estado IN "
+                  "('aplicada','vencida','levantada')")["c"]
+    n_lev = db.q1("SELECT COUNT(*) c FROM ordenes WHERE estado='levantada'")["c"]
     n_rec = db.q1("SELECT COUNT(*) c FROM reclamos")["c"]
     fin_run = reloj.finalizado
 
@@ -244,8 +250,8 @@ def frag_grafo(reloj, turnos, modo, poller) -> str:
                "verifying" if pend else "running")
     sin = (f"<div class='nodo b-cor'><span class=coral><b>CONSOLIDACIÓN — "
            f"despacho a ISPs</b></span> {dot(est_syn)} "
-           f"{''.join(pills)}<span class=dim tiny> aplicadas {n_apl}/{n_ord}"
-           f" · pend {pend} · reclamos {n_rec}</span></div>")
+           f"{''.join(pills)}<span class=dim tiny> efectivas {n_apl}/{n_ord}"
+           f" · levantadas {n_lev} · pend {pend} · reclamos {n_rec}</span></div>")
 
     con = ("<div class=link><span class=ln></span>"
            "<span class=tx>▼</span><span class=ln></span></div>")
@@ -278,7 +284,7 @@ def frag_grafo(reloj, turnos, modo, poller) -> str:
 
     return (f"{orch}"
             f"<div class=link><span class=ln></span>"
-            f"<span class=tx>delegra peritaje · agentes en paralelo ▼</span>"
+            f"<span class=tx>delega peritaje · agentes en paralelo ▼</span>"
             f"<span class=ln></span></div>"
             f"<div class=ramas>{a_det}{a_per}{a_pl}</div>"
             f"<div class=link><span class=ln></span>"

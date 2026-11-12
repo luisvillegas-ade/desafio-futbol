@@ -45,12 +45,47 @@ def hilo_turnos(reloj, turnos, detener):
         time.sleep(0.5)
 
 
+def hilo_cierre(reloj, detener):
+    """Cierra el circuito al vencer la ventana (fin del partido + gracia):
+
+    toda cautelar vence al minuto fin_min — los expedientes no archivados
+    pasan a 'cerrado' en dependencia 'archivo' con su cerrado_min, y queda
+    asentada la actuación 'vencimiento' en cada cadena.
+    """
+    cerrado = False
+    while not detener.is_set() and not cerrado:
+        if reloj.ahora() >= reloj.fin_min + 5.0:
+            ahora = reloj.ahora()
+            with db.bloqueo():
+                exps = db.q("SELECT id FROM expedientes WHERE estado NOT IN "
+                            "('archivado','cerrado')")
+                for e in exps:
+                    db.ejecutar(
+                        "UPDATE expedientes SET estado='cerrado', "
+                        "dependencia='archivo', cerrado_min=? WHERE id=?",
+                        (ahora, e["id"]))
+                    db.actuacion(
+                        e["id"], "vencimiento",
+                        f"Vencieron las medidas cautelares (fin del partido "
+                        f"+ 5 min de gracia, min {ahora:.1f}): el expediente "
+                        f"pasa a archivo", ahora)
+            if exps:
+                db.actuacion(
+                    None, "vencimiento",
+                    f"Cierre del circuito al min {ahora:.1f}: {len(exps)} "
+                    f"expediente(s) pasan a archivo", ahora)
+            cerrado = True
+        time.sleep(1.0)
+
+
 def main() -> None:
     p = argparse.ArgumentParser(description="Plataforma de bloqueo en vivo")
     p.add_argument("--servidor", default=config.SERVIDOR)
-    p.add_argument("--modo", choices=["auto", "interactivo"], default="auto",
-                   help="auto: firma inmediata (orden marco). interactivo: el "
-                        "juez aprueba desde la web")
+    p.add_argument("--modo", choices=["auto", "interactivo"],
+                   default="interactivo",
+                   help="interactivo: el juez aprueba y firma desde la web "
+                        "(modo de evaluación). auto: firma sola como orden "
+                        "marco — solo para pruebas internas")
     p.add_argument("--puerto-ui", type=int, default=config.PUERTO_UI)
     p.add_argument("--reset", action="store_true", help="borra la BD al arrancar")
     p.add_argument("--sin-ui", action="store_true")
@@ -70,16 +105,21 @@ def main() -> None:
     reloj = Reloj()
     turnos = Turnos(reloj)
     verificador = Verificador(cliente)
-    dispatcher = Dispatcher(cliente, reloj, turnos)
-    gestor = mod_reclamos.GestorReclamos(cliente, reloj, turnos, dispatcher)
+    dispatcher = Dispatcher(cliente, reloj, turnos,
+                            modo_auto=(args.modo == "auto"))
+    gestor = mod_reclamos.GestorReclamos(cliente, reloj, turnos, dispatcher,
+                                        modo_auto=(args.modo == "auto"))
 
     poller = Poller(cliente, reloj, turnos, verificador, dispatcher, gestor,
                     modo_auto=(args.modo == "auto"))
     detener = threading.Event()
     t_turnos = threading.Thread(target=hilo_turnos, args=(reloj, turnos, detener),
                                 daemon=True, name="Thread-RelojTurnos")
+    t_cierre = threading.Thread(target=hilo_cierre, args=(reloj, detener),
+                                daemon=True, name="Thread-Cierre")
     poller.start()
     t_turnos.start()
+    t_cierre.start()
 
     if not args.sin_ui:
         from .juez.servidor_ui import ServidorUI
