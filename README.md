@@ -12,9 +12,24 @@ Una plataforma en **Python 3.9+ estándar, cero dependencias externas**, que cor
 
 ### Cómo correr
 
-```bash
-# Terminal 1 — simulador (en Windows: PYTHONUTF8=1, el print de arranque usa '≈')
-PYTHONUTF8=1 python simulador/servidor.py --escenario datos/escenario_practica.json --acelerar 6
+**Camino fácil (recomendado):** doble click en `JUGAR.bat`, o un solo comando:
+
+```powershell
+python demo.py                  # interactivo (usted es el juez) a x6 (~17 min)
+python demo.py --acelerar 60    # ~2 min, para iterar
+python demo.py --modo auto      # firma automática, corre solo
+```
+
+Arranca simulador + plataforma, abre el navegador en la consola judicial y,
+al terminar el partido (más los 5 min de gracia), corre `verificar.py` y
+muestra el puntaje. Si los puertos 8080/8090 están ocupados por corridas
+viejas, pregunta si los frena.
+
+**Manual** (tres terminales):
+
+```powershell
+# Terminal 1 — simulador (Windows: PYTHONUTF8=1, el print usa '≈')
+$env:PYTHONUTF8=1; python simulador/servidor.py --escenario datos/escenario_practica.json --acelerar 6
 
 # Terminal 2 — plataforma (desde la raíz del repo)
 python -m plataforma.main --modo auto --reset          # auto-firma (orden marco judicial)
