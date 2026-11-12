@@ -39,6 +39,14 @@ def log(msg):
     print(msg, flush=True)
 
 
+def pausa():
+    """Mantiene la ventana abierta (doble click en JUGAR.bat)."""
+    try:
+        input("\n[demo] Enter para cerrar la ventana…")
+    except EOFError:
+        pass
+
+
 def esperar_http(url, timeout=15):
     t0 = time.time()
     while time.time() - t0 < timeout:
@@ -61,8 +69,10 @@ def estado():
 def pids_en_puerto(puerto):
     """PIDs escuchando en TCP :puerto (Windows). Vacío si no hay."""
     try:
+        # bytes + decode manual: netstat habla en la codepage OEM de Windows
+        # (cp850); con text=True y Python en UTF-8 la salida rompe la decodificación
         out = subprocess.run(["netstat", "-ano"], capture_output=True,
-                             text=True, timeout=10).stdout
+                             timeout=10).stdout.decode("utf-8", errors="replace")
     except Exception:
         return set()
     pids = set()
@@ -70,7 +80,7 @@ def pids_en_puerto(puerto):
         partes = linea.split()
         if (len(partes) >= 5 and partes[0] == "TCP"
                 and partes[1].endswith(f":{puerto}")
-                and partes[-1] == "LISTENING"):
+                and partes[-2] == "LISTENING"):
             pids.add(partes[-1])
     return pids
 
@@ -82,22 +92,22 @@ def limpiar_puertos():
         ocupados |= pids_en_puerto(p)
     ocupados.discard(str(os.getpid()))
     if not ocupados:
-        return
+        return True
     log(f"[demo] puertos 8080/8090 ocupados por PID(s): {', '.join(sorted(ocupados))}")
     log("       (corridas viejas del simulador/plataforma todavía vivas)")
     try:
-        resp = input("[demo] ¿los freno? [s/N] ").strip().lower()
+        resp = input("[demo] ¿los freno? [S/n] ").strip().lower()
     except EOFError:
-        resp = ""
-    if resp != "s":
-        log("[demo] no se frenaron: cerrá las ventanas viejas o volvé a correr "
-            "con Enter para abortar.")
-        sys.exit(1)
+        resp = "s"
+    if resp in ("n", "no"):
+        log("[demo] no se frenaron: cerrá las ventanas viejas y volvé a correr.")
+        return False
     for pid in ocupados:
         subprocess.run(["taskkill", "/PID", pid, "/F"],
                        capture_output=True)
         log(f"[demo] PID {pid} frenado")
     time.sleep(1)
+    return True
 
 
 def main():
@@ -108,7 +118,9 @@ def main():
     ap.add_argument("--inicio-min", type=float, default=None)
     a = ap.parse_args()
 
-    limpiar_puertos()
+    if not limpiar_puertos():
+        pausa()
+        return
 
     env = dict(os.environ, PYTHONUTF8="1")
     log_dir = RAIZ / "salida"
@@ -181,6 +193,7 @@ def main():
                 p.terminate()
         sim_log.close()
         plat_log.close()
+        pausa()
 
 
 if __name__ == "__main__":
