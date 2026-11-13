@@ -193,7 +193,9 @@ class ServidorUI(threading.Thread):
                         return self._html(T.reclamar(
                             error="El módulo de reclamos no está activo."), 503)
                     n = ui.gestor.procesar_ciudadano(dominio, mensaje)
-                    return self._html(T.reclamar(exito=n))
+                    return self._html(T.reclamar(
+                        exito=n, dominio=dominio, mensaje=mensaje,
+                        minuto=ui.reloj.ahora()))
                 sesion = self._sesion()
                 if not sesion:
                     return self._redirect("/login")
