@@ -1,156 +1,119 @@
-# Juzgado Digital de Bloqueo en Vivo
+# DEOB + SICRE: Juzgado Digital de Bloqueo en Vivo
 
-**Plataforma judicial para el Desafío Fútbol — Hackathon Argentina Space 2026** · Track Datos y Streaming · Salta, 11 al 13 de noviembre de 2026
-
-Autor: Luis Alberto Villegas ([luisvillegas-ade](https://github.com/luisvillegas-ade)) · Demo en línea: https://desafio-futbol-two.vercel.app · Consigna original de la organización: [CONSIGNA-ORIGINAL.md](CONSIGNA-ORIGINAL.md)
-
-> **Aviso.** Todos los datos de este repositorio son ficticios: proveedores de internet, juzgados, jueces, partidos, dominios e IPs. Los dominios terminan en `.test` o `.example`, las IPs son de documentación (RFC 5737) y los ASN son del rango privado. No se bloquea nada real: todo ocurre dentro del simulador. Este material no es asesoramiento legal.
+**Sistema Federal de Medidas Cautelares en Vivo y Tutela de Terceros Afectados**  
+*Hackathon Argentina Space 2026 · Track Datos y Streaming (QualyData) · Salta, 11 al 13 de noviembre de 2026*  
+**Autor:** Luis Alberto Villegas ([@luisvillegas-ade](https://github.com/luisvillegas-ade))  
+**Vidriera en línea:** [https://desafio-futbol-two.vercel.app](https://desafio-futbol-two.vercel.app) *(Jueces: `laura` / `martin`)*  
+**Consigna del desafío:** [CONSIGNA-ORIGINAL.md](CONSIGNA-ORIGINAL.md) · **Entregables Día 3:** [`entrega/`](entrega/)
 
 ---
 
-## Nuestra solución
+## ⚖️ Nuestra propuesta: DEOB + SICRE
 
-Una plataforma en **Python 3.9+ estándar, cero dependencias externas**, que corre el circuito completo contra el simulador: detección → expediente judicial con evidencia → firma del juez de turno → despacho paralelo a los 4 proveedores → confirmación → vencimiento automático, más el módulo de reclamos (levantamiento firmado + reemplazo por dominio) y un portal público de transparencia.
+En un partido de fútbol, la piratería en vivo cambia de IP y servidor en minutos. Cortarla a ciegas causa un daño irreparable: derriba sitios legítimos de comercios, pymes o municipios alojados en la misma infraestructura compartida. Y delegar la censura a un algoritmo viola el art. 57 inc. a) de la Ley 27.078 (Argentina Digital).
 
-**Por qué stdlib puro:** el partido final corre en una máquina que no conocemos; sin `pip install` no hay nada que pueda fallar. Todo el código de la plataforma está en `plataforma/` y fue escrito durante el hackathon; `simulador/`, `datos/`, `evaluacion/` y `ejemplos/` son el material provisto por la organización.
+Inspirados en la arquitectura judicial del **Poder Judicial de la Nación (PJN)** —que ya implementó **DEOX** para oficios electrónicos y opera sobre **Lex100**— desarrollamos una solución integral de Estado compuesta por dos módulos complementarios:
 
-### Cómo correr
+1. **DEOB (Diligenciamiento Electrónico de Órdenes de Bloqueo en Vivo):**  
+   Módulo judicial que realiza el peritaje técnico forense en tiempo real (marca de agua + DNS pasivo), arma el expediente electrónico encadenado con hashes criptográficos y somete la cautelar a la firma digital del **juez de turno personal**. Despacha en paralelo a todos los ISPs del país, reintenta fallas y vence automáticamente al finalizar el evento deportivo.
+2. **SICRE (Sistema Integral de Consulta y Reclamo Electrónico):**  
+   Módulo público sumarísimo y gratuito (vía pública `/reclamar`, sin login ni letrado). Si un sitio legítimo sufre daño colateral, denuncia su dominio; el reclamo ingresa en segundos al despacho del magistrado, quien con un clic firma el levantamiento y su reemplazo por bloqueo de FQDN. **Debido proceso constitucional en tiempo real**.
 
-**Camino fácil (recomendado):** doble click en `JUGAR.bat`, o un solo comando:
+---
+
+## 🚀 Cómo correr el sistema (100% Python Estándar, Cero `pip install`)
+
+> **Por qué stdlib puro para la evaluación oficial:**  
+> El partido final corre en una máquina de evaluación de la organización. Sin dependencias externas no hay riesgos de red, conflictos de entorno ni fallas de librerías. Todo el motor core corre nativamente en Python 3.9+ estándar.
+
+### Camino rápido (Recomendado):
+Doble click en `JUGAR.bat`, o un solo comando en PowerShell:
 
 ```powershell
-python demo.py                  # interactivo (usted es el juez) a x6 (~17 min)
-python demo.py --acelerar 60    # ~2 min, para iterar
-python demo.py --modo auto      # solo para pruebas internas (ver nota abajo)
+python demo.py                  # Modo interactivo a x6 (~17 min reales)
+python demo.py --acelerar 25    # Velocidad sugerida para probar clicks y grabar (~4 min)
+python demo.py --acelerar 60    # Corrida rápida de iteración (~2 min)
 ```
 
-`demo.py` arranca simulador + plataforma, abre el navegador en la consola
-judicial y, al terminar el partido (más los 5 min de gracia), corre
-`verificar.py` y muestra el puntaje. Si los puertos 8080/8090 están ocupados
-por corridas viejas, pregunta si los frena. `JUGAR.bat` es el atajo de
-doble click: misma función, acepta los mismos flags (`JUGAR.bat --acelerar 60`).
+`demo.py` inicia el simulador oficial y la plataforma, abre el navegador en la consola judicial y, tras cumplirse los 5 minutos de gracia reglamentarios, ejecuta automáticamente `evaluacion/verificar.py` mostrando el tablero de control.
 
-**Modo de ejecución:** `--modo interactivo` es el modo por defecto y el del
-partido final: el juez inicia sesión y **aprueba con un clic** cada orden —
-nadie firma en su nombre (regla del enunciado). `--modo auto` queda como
-herramienta de pruebas internas: firma sin intervención humana bajo la
-narrativa de "orden marco" de la propuesta normativa.
-
-**Manual** (tres terminales):
+### Ejecución manual (Tres terminales):
 
 ```powershell
-# Terminal 1 — simulador (Windows: PYTHONUTF8=1, el print usa '≈')
+# Terminal 1 — Simulador oficial (en Windows habilitar UTF-8 para caracteres especiales)
 $env:PYTHONUTF8=1; python simulador/servidor.py --escenario datos/escenario_practica.json --acelerar 6
 
-# Terminal 2 — plataforma (desde la raíz del repo)
-python -m plataforma.main --modo interactivo --reset   # el juez aprueba cada orden en la web
-python -m plataforma.main --modo interactivo --reset --servidor http://<ip>:8080   # partido final
+# Terminal 2 — Plataforma judicial (desde la raíz del repo)
+python -m plataforma.main --modo interactivo --reset
 
-# Consola judicial: http://127.0.0.1:8090  (clave demo para todos)
-#   Jueces:     laura / martin   (firman solo estando de turno)
-#   Secretaría: secretario       (pases, devolución a pericia, archivo)
-#   Fiscalía:   operador         (pases, revisión, informes)
-#   Admin:      admin            (visión completa del sistema)
-# Monitor en vivo:  http://127.0.0.1:8090/monitor        (público)
-# Transparencia:    http://127.0.0.1:8090/transparencia  (público)
-# Reclamos web:     http://127.0.0.1:8090/reclamar       (público)
+# Superficies disponibles:
+#   • Consola judicial:    http://127.0.0.1:8090  (laura / martin — clave: demo)
+#   • Monitor en vivo:     http://127.0.0.1:8090/monitor        (público / NOC)
+#   • Transparencia:       http://127.0.0.1:8090/transparencia  (público)
+#   • Portal SICRE:        http://127.0.0.1:8090/reclamar       (público)
 
-# Terminal 3 — cuando el partido termina (+5 min de gracia)
+# Terminal 3 — Evaluación y Auditoría (al finalizar el partido + 5 min gracia)
 python evaluacion/verificar.py --log salida/registro.jsonl
-
-# Cadena de custodia (verificable sin confiar en la plataforma):
-python -m plataforma.auditoria.verificar_cadena                          # DB viva
-python -m plataforma.auditoria.verificar_cadena entrega/registro-auditoria.json
-
-# Exportar los entregables del día 3
-python -m plataforma.main --exportar   # escribe entrega/expediente-ejemplo.json y registro-auditoria.json
+python -m plataforma.auditoria.verificar_cadena                  # Verifica integridad SHA-256
 ```
-
-**Pruebas automatizadas del circuito interactivo** (no hace falta clickear a
-mano para iterar): `python scripts/juez_click.py --forzar-ip tv.verpartido-hd.test`
-hace login como el juez de turno, aprueba los expedientes elevados, hace lugar
-a los reclamos de la bandeja y re-loguea al juez entrante en el cambio de turno.
-`scripts/test_reclamo.py` hace solo el paso de `forzar-ip` sobre el expediente
-de IP compartida para provocar los reclamos de la demo.
-
-Flags de la plataforma: `--modo auto|interactivo` · `--servidor URL` · `--reset` (borra la BD) · `--sin-ui` · `--exportar` · `--puerto-ui`.
-
-Flags útiles del simulador: `--acelerar 60` (partido en ~2 min para iterar) · `--inicio-min 40` (probar el cambio de turno judicial del minuto 50).
-
-### En línea (vidriera opcional)
-
-Consola judicial, portal de transparencia, monitor y SICRE desplegados en Vercel con base Neon/Postgres (São Paulo): **https://desafio-futbol-two.vercel.app** (jueces de demo `laura` / `martin`; la clave se entrega aparte).
-
-```
-celular del juez ──► Vercel (FastAPI, solo registra la decisión en Neon/Postgres)
-                                      │  el motor local la lee, firma y despacha
-simulador (LAN)  ◄── motor local (plataforma/, stdlib) ◄──┘  con DATABASE_URL=postgres://...
-```
-
-La web **solo registra decisiones**: quien firma y despacha al simulador es siempre el motor local (`plataforma/motor/decisiones_web.py`, leído por el hilo de reclamos). Sin `DATABASE_URL` nada de esto se activa: **el partido oficial corre 100 % local con SQLite**, tal como está verificado arriba. `requirements.txt` (fastapi/uvicorn/psycopg) es solo para `plataforma/api/`; el motor sigue sin dependencias.
-
-### Qué hace (pipeline)
-
-1. **Detección y verificación pericial** (`motor/verificador.py`): polling de `/detecciones` con cursor persistente; contrasta la marca de agua contra `/partido`, excluye licenciatarios en sus dominios autorizados (marca `LIC` en dominio ajeno = pirata retransmitiendo) y consulta `/dns-pasivo` para medir el riesgo colateral de cada IP.
-2. **Expediente digital** (`motor/expediente.py` + `db.py`): un expediente por tupla `(host_stream, ip_servidor)`; un cambio de IP/host abre una ampliación cautelar (fase nueva del mismo stream). Cada actuación se numera y encadena con hash SHA-256 (cadena de custodia, append-only).
-3. **Regla IP vs. dominio:** si la IP aloja dominios ajenos al infractor (CDN/hosting compartido) → orden por `dominio`; si es dedicada → orden por `ip`. Si el DNS pasivo no responde, se elige `dominio` (nunca genera daño colateral).
-4. **Firma judicial con turnos** (`motor/turnos.py`): si falta menos de ~0.6 min para el fin del turno (cambio en el minuto 50), la firma espera al borde y la orden sale firmada por el juez entrante — cero órdenes fuera de turno.
-5. **Despacho paralelo y reintentos** (`motor/dispatcher.py`): un worker por `(expediente, proveedor)`; monitor consolidado (4 consultas por ciclo, no una por orden). FibraValle solo acepta `dominio` — se traduce la orden para ese proveedor. Las fallas de Cumbre (~35 %) se reintentan con `orden_id` nuevo (`ord-<exp>-<prov>-rep<n>-r<i>`) y firma recalculada con el juez que aprobó si sigue de turno; si no, el expediente se re-eleva al entrante. La espera de confirmación no tiene timeout real fijo: aguanta hasta el estado terminal o el cierre del simulador.
-6. **Reclamos** (`motor/reclamos.py`): polling de `/reclamos` en hilo propio (no bloquea el feed de detecciones). Ubica la orden activa que afecta al dominio reclamado y, en modo interactivo, **la eleva a la bandeja del juez de turno**: con un clic ("hacer lugar") el juez firma el levantamiento y la plataforma despacha el reemplazo por `dominio` más preciso.
-7. **Consola judicial por roles** (`juez/`): el expediente circula por dependencias `pericia → secretaría → juzgado → despacho → archivo` y cada pase queda asentado como actuación `pase` en la cadena de custodia. El juez firma solo estando de turno y la firma queda ligada a **su** clic (`aprobada_por`): si aprobó cerca del borde del turno, el expediente se re-eleva al juez entrante y espera su aprobación — nadie firma en nombre de otro. Secretaría y fiscalía hacen pases, devuelven a revisión técnica y archivan; el admin ve todo. Botones: aprobar / forzar-IP / rechazar / **iniciar revisión** (re-peritaje en vivo) / archivar / **emitir informe** imprimible (`/exp/<id>/informe`). La bandeja avisa con alerta sonora, banner y el atajo `A` cuando hay actuaciones esperando firma. Superficies públicas: `/transparencia`, `/reclamar` (procedimiento sumario digital) y `/monitor` (tablero en vivo).
-
-### Resultados en el escenario de práctica
-
-`verificar.py` sobre la última corrida completa **en modo interactivo**
-(desde minuto 0, aceleración ×6, el juez firma desde la consola web —
-`scripts/juez_click.py --lote`, con «Aprobar todo» — incluyendo la demo de
-reclamos con `forzar-ip` sobre la IP compartida). Salidas textuales
-completas en `entrega/validacion/`:
-
-```
-fases piratas bloqueadas: 7 de 7      visibilidad residual: 3,2 %
-falsos positivos / rechazos / órdenes fuera de turno: 0
-reclamos (provocados para la demo): 3/3 resueltos por levantamiento
-colateral de la demo: 3 bloqueos IP sobre 4 sitios legítimos, todos levantados
-cadena de custodia: ÍNTEGRA (180 actuaciones, 38 evidencias, 33 órdenes)
-```
-
-Comparación con el cliente de referencia de la organización
-(`ejemplos/cliente_minimo.py`), mismo escenario y mismo evaluador:
-
-| | Cliente de ejemplo (org) | Esta plataforma |
-|---|---|---|
-| Fases piratas bloqueadas | 1 de 7 | **7 de 7** |
-| Visibilidad residual promedio | 86,6 % | **3,2 %** |
-| Firma | sin juez | juez de turno, desde la consola |
-| Órdenes fuera de turno / falsos positivos | — | 0 / 0 |
-
-### Supuestos y decisiones de diseño
-
-- **SQLite como SSOT por defecto** (`plataforma/datos_app/plataforma.db`) con un lock global: la carga es baja y elimina cualquier problema de concurrencia. Con `DATABASE_URL=postgres://...` el mismo `db.py` usa Postgres (Neon) para la vidriera en línea; la foliación de actuaciones es atómica en ambos backends y los hashes son idénticos.
-- **`vence_min` entero = `fin_min` del partido**: los bloqueos por IP vencen solos al terminar (propuesta normativa, punto 4). Al vencer la ventana (fin + 5 min de gracia) la plataforma asienta la actuación `vencimiento` en cada expediente y los pasa a `cerrado`/`archivo`.
-- **Firma judicial personal**: en `modo interactivo` la orden solo se firma con la clave del juez que hizo clic aprobando, y solo si sigue de turno con margen seguro; de lo contrario se re-eleva al entrante. `modo auto` queda para pruebas internas (la "orden marco" es un punto de la propuesta normativa, no un atajo del MVP).
-- Las claves de firma se leen de `datos/juzgados.json` (las del material del desafío; no hay secretos reales en el repo).
-- **`dominio_base()` maneja TLDs compuestos** (`.com.ar`, `.org.ar`, `.gob.ar`, `.co.uk`): `panaderia.com.ar` y `pirata.com.ar` no se confunden como mismo operador — sin esto, un CDN argentino generaría daño colateral masivo.
-
-### Entregables y archivos propios
-
-Código escrito durante el hackathon (todo stdlib):
-
-- `plataforma/` — el sistema completo (motor, consola judicial, auditoría).
-- `demo.py` + `JUGAR.bat` — lanzador todo-en-uno (sim + plataforma + navegador + puntaje).
-- `scripts/juez_click.py`, `scripts/test_reclamo.py` — pruebas automatizadas del circuito interactivo y de reclamos.
-- `GRABAR-VIDEO.md` — guion paso a paso del video ≤ 3 min.
-- `AGENTS.md` — bitácora técnica completa (quirks del simulador verificados, arquitectura, resultados).
-- `plataforma/api/` + `api/index.py` + `vercel.json` + `requirements.txt` — capa web opcional (FastAPI) para Vercel/Neon; `PLAN-VERCEL.md` es su plan. El motor no la importa.
-
-Entregables del día 3:
-
-- `entrega/propuesta-normativa.md` — 1 página, 7 puntos.
-- `entrega/expediente-ejemplo.json` y `entrega/registro-auditoria.json` — exportados de una corrida real con `--exportar`.
 
 ---
 
+## 🌐 Vidriera en línea (Vercel + Neon/Postgres)
+
+Para permitir que el juez revise expedientes desde su celular o que la ciudadanía consulte el registro público desde cualquier dispositivo, desarrollamos una vidriera web en **[https://desafio-futbol-two.vercel.app](https://desafio-futbol-two.vercel.app)**.
+
+```
+Celular del Juez / Ciudadano ──► Vercel (FastAPI en Neon/Postgres São Paulo)
+                                       │ (La web registra la decisión firmada)
+Simulador Oficial (Local)   ◄── Motor Local (plataforma/, Python stdlib)
+```
+
+- **Arquitectura desacoplada:** La web sólo actúa como interfaz de captura; el motor local lee las decisiones, las valida criptográficamente contra el reloj del simulador y las despacha.
+- **Sin `DATABASE_URL`:** El sistema corre en SQLite local 100% puro y aislado, garantizando el cumplimiento estricto del evaluador del hackathon.
+
 ---
 
-La consigna completa del desafío, tal como la publicó la organización, está en [CONSIGNA-ORIGINAL.md](CONSIGNA-ORIGINAL.md).
+## 📊 Resultados Auditados en el Escenario Oficial
+
+Métricas arrojadas por el evaluador oficial (`evaluacion/verificar.py`) sobre la corrida interactiva completa:
+
+| Métrica de Evaluación | Cliente Mínimo (Org) | Sistema DEOB + SICRE | Estado |
+|---|:---:|:---:|:---:|
+| **Fases piratas bloqueadas** | 1 de 7 | **7 de 7 (100 %)** | ✅ Óptimo |
+| **Visibilidad residual promedio** | 86,6 % | **3,2 %** | ✅ Máxima efectividad |
+| **Falsos positivos (Licenciatarios)** | — | **0** | ✅ Canal Norte protegido |
+| **Órdenes fuera de turno judicial** | — | **0** | ✅ Respeto estricto del min 50 |
+| **Bloqueos residuales post-partido** | Sí | **0** | ✅ Vencimiento de pleno derecho |
+| **Reclamos atendidos (SICRE)** | 0 | **3 de 3 (100 %)** | ✅ Levantados y sustituidos |
+| **Cadena de Custodia Criptográfica** | No | **INTEGRIDAD OK** | ✅ 180 fojas, 38 ev, 33 ord |
+
+---
+
+## 🏛️ Pipeline Técnico del Sistema
+
+1. **Peritaje Forense Automatizado (`motor/verificador.py`):**  
+   Extrae la marca de agua y la contrasta contra `/partido`. Excluye licenciatarios en sus dominios autorizados y consulta `/dns-pasivo` para clasificar la infraestructura (IP dedicada vs. hosting compartido/CDN).
+2. **Expediente Electrónico Encadenado (`motor/expediente.py` + `db.py`):**  
+   Carátula única por tupla `(host_stream, ip_servidor)`. Cada cambio de IP abre una ampliación de fase cautelar. Cada foja se numera y enlaza mediante:  
+   `sha256(hash_previo | expediente_id | foja_n | tipo | detalle | minuto | timestamp_iso)`.
+3. **Control Estricto de Turnos Judiciales (`motor/turnos.py`):**  
+   La orden sólo es válida si el juez está formalmente de turno. Con un margen de seguridad de 0,6 min antes del relevo (min 50), las aprobaciones se transfieren al juez entrante. Nadie firma por otro.
+4. **Despacho Multicanal y Reintentos (`motor/dispatcher.py`):**  
+   Despacho simultáneo a los cuatro prestadores. Traducción automática para proveedores con soporte restringido (ej. FibraValle sólo acepta FQDN). Reintento inmediato ante caídas de enlace (Cumbre ~35% error) con `orden_id` nuevo.
+5. **Vencimiento de Pleno Derecho (`hilo_cierre` en `main.py`):**  
+   Al llegar al pitazo final (`fin_min + 5`), todas las restricciones por IP se extinguen automáticamente, eliminando la censura residual.
+6. **Módulo SICRE (`motor/reclamos.py`):**  
+   Canal de atención ciudadana inmediata. Identifica qué ISP bloquea al inocente, eleva la tercería a la bandeja del juez y ejecuta el levantamiento con sustitución de medida.
+
+---
+
+## 📁 Entregables del Hackathon (Día 3)
+
+Todos los entregables exigidos por la organización se encuentran disponibles en el repositorio:
+
+- **Propuesta Normativa (1 página, 7 puntos):** [`entrega/propuesta-normativa.md`](entrega/propuesta-normativa.md). Establece las bases legales para la orden marco dinámica, el Registro Federal de Proveedores (RFPA) y el procedimiento sumario de reclamos bajo la Ley 19.549.
+- **Expediente de Ejemplo Exportado:** [`entrega/expediente-ejemplo.json`](entrega/expediente-ejemplo.json). Causa `EXP-2026-000003` completa con evidencias, fojas y órdenes.
+- **Registro Integral de Auditoría:** [`entrega/registro-auditoria.json`](entrega/registro-auditoria.json). Cadena de custodia íntegra verificable con `verificar_cadena.py`.
+- **Guía de Grabación y Demo:** [`GRABAR-VIDEO.md`](GRABAR-VIDEO.md).
+- **Pitch Oficial del Equipo:** [`PITCH-MASTER.md`](PITCH-MASTER.md).

@@ -1,152 +1,94 @@
-# 🎬 GRABAR EL VIDEO — paso a paso exacto
-
-Lo único que necesitás: **una terminal PowerShell** y **el navegador**.
-Grabás la pantalla con **Win + G** (Xbox Game Bar, ya viene con Windows)
-o con OBS si lo tenés. Duración objetivo: menos de 3 minutos.
+# 🎬 GUÍA PRÁCTICA: CÓMO GRABAR LA PANTALLA EN SILENCIO (VELOCIDAD CÓMODA)
+*(Aceleración x25: te da 2 minutos enteros de reloj real para hacer los clicks con la Jueza Laura antes del cambio de turno).*
 
 ---
 
-## PASO 0 — Preparar (una sola vez)
+## ⚙️ PASO 0 — Preparar el entorno (Antes de grabar)
 
-1. Abrí PowerShell (tecla Windows → escribí `powershell` → Enter).
-2. Copiá y pegá estas **dos líneas**:
-
+### 1. Terminal 1 (Ejecutar con aceleración x25):
 ```powershell
 cd C:\Proyectos-Hackatones\argentinaSpace\desafio-futbol
-python demo.py --acelerar 60
+python demo.py --acelerar 25
 ```
+*(Si te pregunta `[demo] ¿los freno? [S/n]`, apretá **Enter**).*
 
-3. Si pregunta `[demo] ¿los freno? [S/n]` → apretá **Enter** (nada más).
-4. Esperá ~10 segundos: **se abre el navegador solo** en la consola judicial.
-   Cuando lo veas, todo está corriendo. No cierres la terminal.
+### 2. Ventana 1 de Navegador (Normal) — Dejá 4 pestañas abiertas:
+- **Pestaña 1:** `http://127.0.0.1:8090` (Login: poné `laura` / `demo` y entrá a la Bandeja).
+- **Pestaña 2:** `http://127.0.0.1:8090/monitor` *(Dejala visible en pantalla)*.
+- **Pestaña 3:** `http://127.0.0.1:8090/reclamar` (Escribí en el formulario: Dominio: `panaderia-la-espiga.test` | Mensaje: `Bloqueo indebido` — **NO aprietes el botón todavía**).
+- **Pestaña 4:** `http://127.0.0.1:8090/transparencia`.
 
-5. Abrí **una pestaña más** en el navegador con esta dirección:
+### 3. Ventana 2 de Navegador (Modo Incógnito: Ctrl + Shift + N):
+- Abrí `http://127.0.0.1:8090` y logueate con: usuario `martin` / clave `demo`.  
+  *(Dejá esta ventana minimizada o al costado, la usás recién cuando termine el turno de Laura).*
 
-```
-http://127.0.0.1:8090/monitor
-```
-
-Ya tenés tus dos pantallas: **Consola** (pestaña 1) y **Monitor** (pestaña 2).
-
----
-
-## PASO 1 — Empezar a grabar
-
-- Apretá **Win + G** → tocá el botón **⏺ grabar** (o Win + Alt + R directo).
-- El video queda guardado en `Videos\Capturas`.
-
-> Tip: no hace falta hablar perfecto — podés regrabar las veces que quieras,
-> el partido se reinicia cada vez que corrés `python demo.py --acelerar 60`.
-
----
-
-## PASO 2 — Escena 1: el problema y la detección (~25 seg)
-
-**Pantalla:** pestaña del **Monitor**.
-
-El partido corre solo — vas a ver caer las detecciones y crearse los
-expedientes. Decí más o menos esto con tus palabras:
-
-> *"Cada fin de semana se piratean partidos en vivo. El problema: bloquear
-> rápido sin tirar sitios legítimos. Esta plataforma abre un expediente
-> judicial por cada señal pirata — y todo corre en vivo."*
-
----
-
-## PASO 3 — Escena 2: el expediente y la firma del juez (~40 seg)
-
-1. Cambiá a la pestaña **Consola** → login: usuario `laura`, clave `demo`.
-2. Vas a ver expedientes en la bandeja con botones. Entrá a uno (clic en su ID).
-3. Se ve: carátula, peritaje técnico (marca de agua, SHA-256, DNS pasivo),
-   medida sugerida, dependencia. Volvé a la bandeja (`← Bandeja`).
-4. Apretá **"Aprobar y mandar bloqueo urgente"** en un par de expedientes.
-5. Volvé al **Monitor**: las pills `[aurora] [andina] [cumbre] [valle]` se
-   ponen verdes y los chips se mueven a la columna `despacho`.
-
-Decí:
-
-> *"El juez de turno revisa el peritaje automático y firma. La orden sale
-> en paralelo a los cuatro proveedores — y si uno falla, se reintenta solo.
-> Todo movimiento queda en la cadena de custodia, como un libro diario."*
-
----
-
-## PASO 4 — Escena 3: el reclamo del ciudadano (~45 seg)
-
-Esta es la escena estrella.
-
-1. En la **Consola**, entrá al expediente de `tv.verpartido-hd.test`
-   (suele ser `EXP-2026-000005`, aparece ~min 9 — si todavía no está,
-   esperá unos segundos).
-2. Apretá **"Aprobar forzando IP"** → esto bloquea la IP compartida y
-   afecta a la panadería legítima.
-3. Abrí **otra pestaña** (sin login, es público):
-
-```
-http://127.0.0.1:8090/reclamar
-```
-
-4. Escribí `panaderia-la-espiga.test` en el dominio → **Enviar reclamo**.
-5. Volvé a la **Consola**: el reclamo aparece arriba en la bandeja del juez
-   como pendiente → apretá **"Hacer lugar: levantar y reemplazar"**.
-   El juez firma el levantamiento con su clave y el sistema despacha el
-   reemplazo por dominio. (En el Monitor se ve `[reclamos]` en el log.)
-
-Decí:
-
-> *"Si el bloqueo se pasa de largo, hay remedio. El ciudadano reclama sin
-> login, el reclamo llega a la bandeja del juez de turno y con un clic él
-> firma el levantamiento — el sistema lo reemplaza por una medida más
-> precisa. Debido proceso — no censura."*
-
----
-
-## PASO 5 — Escena 4: la prueba de auditor (~30 seg)
-
-1. El partido ya terminó (~2 min). En la **terminal** vas a ver el puntaje:
-   `fases piratas bloqueadas: 7 de 7`.
-2. Abrí **otra PowerShell** (la primera sigue abierta), pegá:
-
+### 4. Terminal 2 (Dejar escrita la línea, sin apretar Enter):
 ```powershell
 cd C:\Proyectos-Hackatones\argentinaSpace\desafio-futbol
 python -m plataforma.auditoria.verificar_cadena
 ```
 
-3. Muestra: `INTEGRIDAD OK — N actuaciones, M evidencias y K órdenes
-   verificadas`.
+---
 
-Decí:
+## 🔴 PASO 1 — Empezar a grabar
 
-> *"Resultado: 7 de 7 fases bloqueadas, cero falsos positivos, cero firmas
-> fuera de turno. Y la cadena de custodia cubre hasta las capturas y cada
-> orden firmada — tocás una foja o una captura y el auditor te dice
-> exactamente cuál está trucada."*
+1. Mirá la **Pestaña 2 (Monitor)**: cuando el reloj arriba marque **`6′`** o **`7′`**:
+2. Apretá **`Win + Alt + R`** (o Win + G) para iniciar la grabación de pantalla.
 
 ---
 
-## PASO 6 — Cortar
+## 🖱️ PASO 2 — Los Clicks Exactos (Sin apuros)
 
-- **Win + Alt + R** otra vez → el video queda en `Videos\Capturas`.
-- Recortalo si quedó largo (fotos de Windows ya trae editor, o Clipchamp).
-
----
-
-## Si algo sale mal
-
-| Problema | Solución |
-|---|---|
-| La ventana se cerró sola | Volvé al PASO 0 — el launcher ya está arreglado |
-| Pregunta sobre puertos | Enter = sí, frena los procesos viejos |
-| El navegador no se abrió | Escribí `http://127.0.0.1:8090` a mano |
-| El partido ya terminó y querés regrabar | Ctrl+C en la terminal, Enter, y PASO 0 otra vez |
-| No existe el expediente verpartido todavía | Esperá ~15 seg más y actualizá la página |
+### [Paso A] En el Monitor (~15 segundos)
+- Estás en la **Pestaña 2 (Monitor)**.
+- Mové suavemente el mouse sobre el registro inferior donde dice `deteccion_descartada` (Canal Norte) y sobre los nodos del centro.
 
 ---
 
-## Resumen en 3 líneas (para tener al lado)
+### [Paso B] Peritaje en el Expediente (~20 segundos)
+1. Cambiá a la **Pestaña 1 (Bandeja de Laura)**.
+2. Hacé clic en el enlace azul **`EXP-2026-000002`** (Golazo Libre).
+3. Quedate unos segundos mostrando la caja celeste que dice *"Por qué esta medida: La IP aloja 12 dominios..."*.
 
-```
-1) cd C:\Proyectos-Hackatones\argentinaSpace\desafio-futbol
-2) python demo.py --acelerar 60        → Enter si pregunta
-3) Win+Alt+R graba · monitor + consola + /reclamar · Win+Alt+R corta
-```
+---
+
+### [Paso C] Firma de la Jueza Laura (~20 segundos)
+1. Hacé clic en **`← Bandeja`** (arriba a la derecha).
+2. Hacé clic en el botón azul **`Aprobar y mandar bloqueo urgente`** de **`EXP-2026-000001`**.
+3. Hacé clic en el botón azul **`Aprobar y mandar bloqueo urgente`** de **`EXP-2026-000002`**.
+4. Cambiá 3 segundos a la **Pestaña 2 (Monitor)**: se ven las pastillas `[aurora] [andina]` en verde.
+
+---
+
+### [Paso D] La Prueba de Reclamo (~35 segundos)
+1. Volvé a la **Pestaña 1 (Bandeja)**.
+2. En la fila de `EXP-2026-000003` (Verpartido), hacé clic en el botón gris **`Aprobar forzando IP`**.
+3. Cambiá a la **Pestaña 3 (`/reclamar`)**.
+4. Hacé clic en el botón **`Presentar reclamo`** (esperá a que aparezca el cartel verde).
+5. Volvé a la **Pestaña 1 (Bandeja)**: arriba apareció la tabla amarilla con el reclamo.
+6. Hacé clic en el botón **`Hacer lugar: levantar y reemplazar`** (o tocá la tecla **`A`**).
+
+*(¡Listo! Todo esto lo terminás con Laura con tiempo de sobra antes de que el reloj llegue al minuto 50).*
+
+---
+
+### [Paso E] Cambio de Turno al Juez Martín (~25 segundos)
+*(Esperá a que el reloj del partido cruce el minuto 50)*
+1. En la Pestaña 1 (Laura), mostrá que arriba ahora dice `FUERA DE TURNO — solo lectura`.
+2. Pasá a la **Ventana Incógnito (Juez Martín)**: mostrá que dice `DE TURNO · puede firmar`.
+3. Si hay algún expediente pendiente en la bandeja de Martín, tocale el botón **`Aprobar`** (o apretá la tecla **`A`**).
+4. Cambiá a la **Pestaña 4 (Transparencia)** unos segundos: se ven las órdenes públicas con su fecha y hora.
+
+---
+
+### [Paso F] Cierre y Verificación Oficial
+1. Cuando el reloj del partido supere los **`110′`** (105 + 5 de gracia), andá directo a la **Terminal 1**.
+2. Mostrá la salida del script oficial `verificar.py` con el texto **`fases piratas bloqueadas: 7 de 7`**.
+3. Cambiá a la **Terminal 2** y apretá **`Enter`**.
+4. Mostrá la salida: **`INTEGRIDAD OK — N actuacion(es)... verificadas`**.
+
+---
+
+## ⏹️ PASO 3 — Cortar la grabación
+- Apretá **`Win + Alt + R`** para cortar la grabación.
+- El video queda en: `Este equipo > Videos > Capturas`.
