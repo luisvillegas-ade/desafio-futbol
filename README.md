@@ -65,18 +65,19 @@ Para permitir que el juez revise expedientes desde su celular o que la ciudadan�
 
 ```
 Celular del Juez / Ciudadano ──► Vercel (FastAPI en Neon/Postgres São Paulo)
-                                       │ (La web registra la decisión firmada)
+                                       │ (la web SOLO registra la decisión; no firma ni despacha)
 Simulador Oficial (Local)   ◄── Motor Local (plataforma/, Python stdlib)
 ```
 
-- **Arquitectura desacoplada:** La web sólo actúa como interfaz de captura; el motor local lee las decisiones, las valida criptográficamente contra el reloj del simulador y las despacha.
+- **Arquitectura desacoplada:** La web sólo actúa como interfaz de captura. El motor local (`plataforma/motor/decisiones_web.py`, leído por el hilo de reclamos) toma cada decisión pendiente, verifica que el juez siga de turno, **firma** la orden con la clave judicial y la despacha a los prestadores. Vercel nunca habla con el simulador.
+- **Dependencias:** `requirements.txt` (fastapi/uvicorn/psycopg) es sólo para `plataforma/api/`; el motor local no lo importa.
 - **Sin `DATABASE_URL`:** El sistema corre en SQLite local 100% puro y aislado, garantizando el cumplimiento estricto del evaluador del hackathon.
 
 ---
 
-## 📊 Resultados Auditados en el Escenario Oficial
+## 📊 Resultados Auditados en el Escenario de Práctica
 
-Métricas arrojadas por el evaluador oficial (`evaluacion/verificar.py`) sobre la corrida interactiva completa:
+Métricas arrojadas por el evaluador oficial (`evaluacion/verificar.py`) sobre la corrida interactiva completa (`datos/escenario_practica.json`, ×6, juez firmando desde la consola). Salidas textuales en [`entrega/validacion/`](entrega/validacion/):
 
 | Métrica de Evaluación | Cliente Mínimo (Org) | Sistema DEOB + SICRE | Estado |
 |---|:---:|:---:|:---:|
@@ -84,9 +85,9 @@ Métricas arrojadas por el evaluador oficial (`evaluacion/verificar.py`) sobre l
 | **Visibilidad residual promedio** | 86,6 % | **3,2 %** | ✅ Máxima efectividad |
 | **Falsos positivos (Licenciatarios)** | — | **0** | ✅ Canal Norte protegido |
 | **Órdenes fuera de turno judicial** | — | **0** | ✅ Respeto estricto del min 50 |
-| **Bloqueos residuales post-partido** | Sí | **0** | ✅ Vencimiento de pleno derecho |
-| **Reclamos atendidos (SICRE)** | 0 | **3 de 3 (100 %)** | ✅ Levantados y sustituidos |
-| **Cadena de Custodia Criptográfica** | No | **INTEGRIDAD OK** | ✅ 180 fojas, 38 ev, 33 ord |
+| **Bloqueos residuales post-partido** | — | **0** | ✅ Vencimiento de pleno derecho |
+| **Reclamos atendidos (SICRE)** | no implementa | **3 de 3 (100 %)** | ✅ Levantados y sustituidos |
+| **Cadena de Custodia Criptográfica** | no implementa | **INTEGRIDAD OK** | ✅ 180 fojas, 38 ev, 33 ord |
 
 ---
 
@@ -105,6 +106,15 @@ Métricas arrojadas por el evaluador oficial (`evaluacion/verificar.py`) sobre l
    Al llegar al pitazo final (`fin_min + 5`), todas las restricciones por IP se extinguen automáticamente, eliminando la censura residual.
 6. **Módulo SICRE (`motor/reclamos.py`):**  
    Canal de atención ciudadana inmediata. Identifica qué ISP bloquea al inocente, eleva la tercería a la bandeja del juez y ejecuta el levantamiento con sustitución de medida.
+
+---
+
+## 🧩 Código previo al evento, supuestos y librerías
+
+- **Material de la organización (previo al evento, sin modificar):** `simulador/`, `datos/`, `evaluacion/`, `ejemplos/`.
+- **Escrito durante el hackathon:** `plataforma/` (motor, consola judicial, auditoría, capa web), `demo.py`, `JUGAR.bat`, `scripts/`, `api/`, `entrega/propuesta-normativa.md` y toda la documentación.
+- **Librerías:** el motor y la consola local usan sólo la biblioteca estándar de Python 3.9+. La vidriera en Vercel usa FastAPI y psycopg (`requirements.txt`); Neon/Postgres es un servicio externo opcional.
+- **Supuestos:** SQLite como fuente única de verdad por defecto (Postgres sólo con `DATABASE_URL`, con hashes idénticos); `vence_min = fin_min` del partido para toda medida por IP; la orden se firma únicamente con la clave del juez que aprobó y sólo si sigue de turno con margen seguro; las claves de firma son las de `datos/juzgados.json` provistas por la organización (no hay secretos reales en el repo); `dominio_base()` trata TLDs compuestos (`.com.ar`, `.gob.ar`) para no confundir operadores en hosting compartido.
 
 ---
 
