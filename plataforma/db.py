@@ -1,9 +1,13 @@
-"""Capa de persistencia SQLite (SSOT) + cadena de custodia en `actuaciones`.
+"""Capa de persistencia (SSOT) + cadena de custodia en `actuaciones`.
 
+Backend por defecto: SQLite local (stdlib). Con DATABASE_URL=postgres://...
+usa Postgres vía psycopg (solo para el despliegue web; ver requirements.txt).
 Una sola conexión compartida protegida por un lock global: la carga es baja y
-evita por completo los problemas de concurrencia de sqlite entre threads.
+evita por completo los problemas de concurrencia entre threads.
 """
 import hashlib
+import os
+import re
 import sqlite3
 import threading
 from contextlib import contextmanager
@@ -13,6 +17,9 @@ from . import config
 
 _lock = threading.RLock()
 _conn = None
+
+DATABASE_URL = os.environ.get("DATABASE_URL", "")
+PG = DATABASE_URL.startswith(("postgres://", "postgresql://"))
 
 ESQUEMA = """
 CREATE TABLE IF NOT EXISTS expedientes (
@@ -96,12 +103,62 @@ CREATE TABLE IF NOT EXISTS cursores (
 """
 
 
+# Postgres: mismas tablas; REAL→DOUBLE PRECISION (float8, ida y vuelta exacta
+# de str(minuto) para los hashes), INTEGER→BIGINT, sin FKs (SQLite no las
+# aplica), y la unicidad (cadena, foja) que vuelve atómico actuacion().
+ESQUEMA_PG = re.sub(
+    r" REFERENCES \w+\(\w+\)", "",
+    ESQUEMA.replace("    cerrado_min REAL\n",
+                    "    cerrado_min REAL,\n    aprobada_por TEXT,\n"
+                    "    aprobada_min REAL\n")
+           .replace("INTEGER PRIMARY KEY AUTOINCREMENT", "BIGSERIAL PRIMARY KEY")
+           .replace(" INTEGER", " BIGINT")
+           .replace(" REAL", " DOUBLE PRECISION")) + """
+CREATE UNIQUE INDEX IF NOT EXISTS actuaciones_foja
+    ON actuaciones (COALESCE(expediente_id, 'SISTEMA'), n);
+
+-- Decisiones registradas por la web desplegada (MODO_WEB): el motor local
+-- las toma y ejecuta la firma y el despacho contra el simulador.
+CREATE TABLE IF NOT EXISTS decisiones_web (
+    id BIGSERIAL PRIMARY KEY,
+    tipo TEXT,                           -- aprobar|hacer_lugar|reclamo_ciudadano
+    objetivo TEXT,                       -- id de expediente / reclamo / dominio
+    juez_id TEXT,
+    datos TEXT,
+    minuto DOUBLE PRECISION,
+    estado TEXT DEFAULT 'pendiente'      -- pendiente|procesada|error
+);
+
+CREATE TABLE IF NOT EXISTS sesiones (
+    sid TEXT PRIMARY KEY,
+    usuario TEXT,
+    expira DOUBLE PRECISION,
+    datos TEXT
+);
+"""
+TABLAS = ("sesiones", "decisiones_web", "cursores", "reclamos", "ordenes", "actuaciones",
+          "evidencias", "expedientes")
+
+
 def iso() -> str:
     return datetime.now().isoformat(timespec="seconds")
 
 
-def conectar() -> sqlite3.Connection:
+def _conectar_pg():
+    import psycopg
+    from psycopg.rows import dict_row
+    c = psycopg.connect(DATABASE_URL, autocommit=True, row_factory=dict_row,
+                        prepare_threshold=None)  # compatible con el pooler
+    c.execute(ESQUEMA_PG)
+    return c
+
+
+def conectar():
     global _conn
+    if PG:
+        if _conn is None or _conn.closed:
+            _conn = _conectar_pg()
+        return _conn
     if _conn is None:
         config.DB_PATH.parent.mkdir(parents=True, exist_ok=True)
         _conn = sqlite3.connect(str(config.DB_PATH), check_same_thread=False)
@@ -139,8 +196,42 @@ def conectar() -> sqlite3.Connection:
     return _conn
 
 
+def _sql_pg(sql: str) -> str:
+    """Dialecto SQLite del código → Postgres (solo con PG)."""
+    sql = sql.replace("%", "%%").replace(" IS ?", " IS NOT DISTINCT FROM ?")
+    if sql.lstrip().startswith("INSERT OR IGNORE"):
+        sql = sql.replace("INSERT OR IGNORE", "INSERT", 1) + \
+            " ON CONFLICT DO NOTHING"
+    return sql.replace("?", "%s")
+
+
+def _params_pg(params):
+    return tuple(int(v) if isinstance(v, bool) else v for v in params)
+
+
+def _pg(sql, params=()):
+    """Ejecuta en Postgres; reconecta una vez si la conexión se cayó."""
+    import psycopg
+    global _conn
+    for intento in (1, 2):
+        try:
+            cur = conectar().execute(_sql_pg(sql), _params_pg(params))
+            return cur
+        except (psycopg.OperationalError, psycopg.InterfaceError):
+            if intento == 2:
+                raise
+            try:
+                _conn.close()
+            except Exception:
+                pass
+            _conn = None
+
+
 def q(sql, params=()):
     with _lock:
+        if PG:
+            cur = _pg(sql, params)
+            return cur.fetchall() if cur.description else []
         return conectar().execute(sql, params).fetchall()
 
 
@@ -149,9 +240,26 @@ def q1(sql, params=()):
     return filas[0] if filas else None
 
 
-def ejecutar(sql, params=()):
-    with _lock, conectar() as c:
-        c.execute(sql, params)
+def ejecutar(sql, params=()) -> int:
+    with _lock:
+        if PG:
+            return _pg(sql, params).rowcount
+        with conectar() as c:
+            return c.execute(sql, params).rowcount
+
+
+def reiniciar() -> bool:
+    """--reset: borra la BD (archivo SQLite, o las tablas en Postgres)."""
+    global _conn
+    with _lock:
+        if PG:
+            conectar().execute("DROP TABLE IF EXISTS " + ", ".join(TABLAS))
+            _conn.execute(ESQUEMA_PG)
+            return True
+        if config.DB_PATH.exists():
+            config.DB_PATH.unlink()
+            return True
+        return False
 
 
 @contextmanager
@@ -198,19 +306,32 @@ def actuacion(expediente_id, tipo: str, detalle: str, minuto: float) -> str:
                   timestamp_iso) — cubre también el timestamp y el propio
     número de foja, así reordenar o retocar metadatos rompe la cadena.
     """
-    with _lock, conectar() as c:
-        prev = c.execute(
-            "SELECT n, hash_actual FROM actuaciones WHERE expediente_id IS ? "
-            "ORDER BY n DESC LIMIT 1", (expediente_id,)).fetchone()
-        n = (prev["n"] + 1) if prev else 1
-        hprev = prev["hash_actual"] if prev else "GENESIS"
-        ts = iso()
-        clave = expediente_id or "SISTEMA"
-        h = hashlib.sha256(
-            f"{hprev}|{clave}|{n}|{tipo}|{detalle}|{minuto}|{ts}"
-            .encode()).hexdigest()
-        c.execute(
-            "INSERT INTO actuaciones(expediente_id,n,tipo,detalle,minuto,timestamp_iso,"
-            "hash_prev,hash_actual) VALUES(?,?,?,?,?,?,?,?)",
-            (expediente_id, n, tipo, detalle, minuto, ts, hprev, h))
-        return h
+    clave = expediente_id or "SISTEMA"
+    # La foja se reserva atómicamente: el INSERT...SELECT solo inserta si n
+    # sigue siendo MAX(n)+1 (y en Postgres el índice único (cadena, n) frena a
+    # dos procesos que lo intenten a la vez); si otro proceso ganó, se relee
+    # la cadena y se reintenta con el nuevo hash_prev.
+    for _ in range(100):
+        with _lock:
+            prev = q1("SELECT n, hash_actual FROM actuaciones WHERE "
+                      "expediente_id IS ? ORDER BY n DESC LIMIT 1",
+                      (expediente_id,))
+            n = (prev["n"] + 1) if prev else 1
+            hprev = prev["hash_actual"] if prev else "GENESIS"
+            ts = iso()
+            h = hashlib.sha256(
+                f"{hprev}|{clave}|{n}|{tipo}|{detalle}|{minuto}|{ts}"
+                .encode()).hexdigest()
+            try:
+                if ejecutar(
+                        "INSERT INTO actuaciones(expediente_id,n,tipo,detalle,"
+                        "minuto,timestamp_iso,hash_prev,hash_actual) "
+                        "SELECT ?,?,?,?,?,?,?,? WHERE (SELECT COALESCE(MAX(n),0)"
+                        " FROM actuaciones WHERE expediente_id IS ?) = ?",
+                        (expediente_id, n, tipo, detalle, minuto, ts, hprev, h,
+                         expediente_id, n - 1)) == 1:
+                    return h
+            except Exception as e:
+                if type(e).__name__ != "UniqueViolation":
+                    raise
+    raise RuntimeError(f"no se pudo foliar actuación de {clave}")

@@ -1,0 +1,5 @@
+# Solo para la capa web desplegada (plataforma/api, Vercel + Postgres).
+# El motor local y la consola local siguen siendo stdlib pura.
+fastapi
+uvicorn
+psycopg[binary]

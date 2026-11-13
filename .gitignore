@@ -3,3 +3,5 @@ __pycache__/
 plataforma/datos_app/*.db
 plataforma/datos_app/*.db-*
 salida/
+.env* 
+.vercel

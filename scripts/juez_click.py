@@ -12,13 +12,14 @@ Uso (con la plataforma corriendo en --modo interactivo):
 expediente.
 """
 import json
+import os
 import sqlite3
 import sys
 import time
 import urllib.parse
 import urllib.request
 
-UI = "http://127.0.0.1:8090"
+UI = os.environ.get("JUEZ_UI", "http://127.0.0.1:8090")
 SIM = "http://127.0.0.1:8080"
 DB = "plataforma/datos_app/plataforma.db"
 USUARIO = {"jueza-laura-ficticia": "laura", "juez-martin-ejemplo": "martin"}
@@ -39,6 +40,11 @@ def turno():
 
 
 def db_q(sql, params=()):
+    if os.environ.get("DATABASE_URL"):  # backend Postgres (Fase 1/2)
+        sys.path.insert(0, os.path.dirname(os.path.dirname(
+            os.path.abspath(__file__))))
+        from plataforma import db
+        return [tuple(r.values()) for r in db.q(sql, params)]
     c = sqlite3.connect(DB)
     try:
         return c.execute(sql, params).fetchall()

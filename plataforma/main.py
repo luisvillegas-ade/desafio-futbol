@@ -96,8 +96,7 @@ def main() -> None:
                    help="exporta entrega/ y sale")
     args = p.parse_args()
 
-    if args.reset and config.DB_PATH.exists():
-        config.DB_PATH.unlink()
+    if args.reset and db.reiniciar():
         print("[main] base de datos reiniciada")
     if args.exportar:
         db.conectar()
