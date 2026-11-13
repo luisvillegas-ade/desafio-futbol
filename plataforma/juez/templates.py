@@ -179,7 +179,10 @@ def bandeja(expedientes, juez: dict, turno_txt: str, minuto: float,
         f"<a href='/transparencia'>Transparencia</a> · "
         f"<a href='/salir'>Salir</a>") + f"""
 <main>{_flash(msg)}{banner}
-<div class=peritaje>Minuto de partido <b>{minuto:.1f}</b> · { _e(turno_txt) }</div>
+<div class=peritaje>Minuto de partido <b>{minuto:.1f}</b> · { _e(turno_txt) }
+<br><span style='font-size:12px;color:#64748b'>Supervisión continua: la plataforma
+detecta y eleva sola — lo que aparece aquí con botones es lo único que espera su
+firma. El atajo <b>A</b> aprueba lo primero de la lista.</span></div>
 {pendientes}
 <table><tr><th>Expediente</th><th>Stream</th><th>Medida sugerida</th>
 <th>Estado / dependencia</th><th>Min</th><th></th></tr>{filas}</table>

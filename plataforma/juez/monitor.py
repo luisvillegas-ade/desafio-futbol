@@ -132,14 +132,16 @@ def frag_header(reloj, turnos, modo) -> str:
     ords = [dict(o) for o in db.q("SELECT * FROM ordenes")]
     ok_cadena, _ = verificar(acts, evs, ords)
     estado = ("<span class=mint>■ FINALIZADO</span>" if reloj.finalizado
-              else "<span class=mint>● EN VIVO</span>")
+              else "<span class=mint>● VIGILANCIA ACTIVA</span>")
     cadena = ("<span class=mint>✓ cadena íntegra</span>" if ok_cadena
               else "<span class=coral>✗ TAMPERADA</span>")
     turno = (f"{_e(j['id'])} →{t['hasta_min']:g}" if t else "—")
     p = ahora / fin if fin else 0
-    return (f"{estado} <b>PLATAFORMA CAUTELAR</b> · modo {_e(modo)}"
-            f" · PARTIDO {barcss(p, 90, '#38BDF8')} "
-            f"{ahora:.0f}/{fin:.0f}′"
+    reloj_txt = (f"<span class=mono style='font-size:17px;font-weight:700;"
+                 f"color:#FB923C'>MIN {ahora:.1f}</span>"
+                 f"<span class=dim style='font-size:11px'>/{fin:.0f}′</span>")
+    return (f"{estado} <b>PLATAFORMA CAUTELAR</b> · {reloj_txt} "
+            f"{barcss(p, 90, '#38BDF8')} · modo {_e(modo)}"
             f" · turno <span class=cyan>{turno}</span>"
             f" · exp {en_ejec}/{n_exp} en ejec. · órdenes {n_ord_act} · "
             f"reclamos {n_rec} · {cadena}")
