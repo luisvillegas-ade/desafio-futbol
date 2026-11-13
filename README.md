@@ -73,6 +73,18 @@ Flags de la plataforma: `--modo auto|interactivo` · `--servidor URL` · `--rese
 
 Flags útiles del simulador: `--acelerar 60` (partido en ~2 min para iterar) · `--inicio-min 40` (probar el cambio de turno judicial del minuto 50).
 
+### En línea (vidriera opcional)
+
+Consola judicial, portal de transparencia, monitor y SICRE desplegados en Vercel con base Neon/Postgres (São Paulo): **https://desafio-futbol-two.vercel.app** (jueces de demo `laura` / `martin`; la clave se entrega aparte).
+
+```
+celular del juez ──► Vercel (FastAPI, solo registra la decisión en Neon/Postgres)
+                                      │  el motor local la lee, firma y despacha
+simulador (LAN)  ◄── motor local (plataforma/, stdlib) ◄──┘  con DATABASE_URL=postgres://...
+```
+
+La web **solo registra decisiones**: quien firma y despacha al simulador es siempre el motor local (`plataforma/motor/decisiones_web.py`, leído por el hilo de reclamos). Sin `DATABASE_URL` nada de esto se activa: **el partido oficial corre 100 % local con SQLite**, tal como está verificado arriba. `requirements.txt` (fastapi/uvicorn/psycopg) es solo para `plataforma/api/`; el motor sigue sin dependencias.
+
 ### Qué hace (pipeline)
 
 1. **Detección y verificación pericial** (`motor/verificador.py`): polling de `/detecciones` con cursor persistente; contrasta la marca de agua contra `/partido`, excluye licenciatarios en sus dominios autorizados (marca `LIC` en dominio ajeno = pirata retransmitiendo) y consulta `/dns-pasivo` para medir el riesgo colateral de cada IP.
