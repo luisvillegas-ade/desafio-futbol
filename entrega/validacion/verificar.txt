@@ -1,0 +1,50 @@
+$ python evaluacion/verificar.py --log salida/registro.jsonl
+Evaluación del escenario practica-01 (registro hasta el minuto 110.0)
+
+Resumen
+  fases piratas bloqueadas: 7 de 7
+  visibilidad residual promedio pct: 3.2
+  ordenes recibidas: 33
+  ordenes aplicadas: 31
+  ordenes fallidas: 2
+  ordenes rechazadas: 0
+  bloqueos con dano colateral: 3
+  dominios legitimos afectados: 4
+  bloqueos falsos positivos: 0
+  bloqueos ip activos post partido: 0
+  reclamos: 3
+  reclamos resueltos por levantamiento: 3
+  ordenes firmadas fuera de turno: 0
+
+1. Streams piratas por fase
+  pelotaya fase 1 (203.0.113.10 / s1.pelotaya.test, min 2–36): primer bloqueo 0.7 min · clientes cubiertos 100.0 % · visibilidad residual 4.0 %
+  pelotaya fase 2 (203.0.113.11 / s2.pelotaya.test, min 37.5–70): primer bloqueo 0.5 min · clientes cubiertos 100.0 % · visibilidad residual 3.5 %
+  pelotaya fase 3 (198.51.100.77 / s3.pelotaya.test, min 71–105): primer bloqueo 0.6 min · clientes cubiertos 100.0 % · visibilidad residual 3.6 %
+  golazo-cdn fase 1 (198.51.100.20 / live.golazo-libre.test, min 6–105): primer bloqueo 0.6 min · clientes cubiertos 100.0 % · visibilidad residual 1.1 %
+  verpartido fase 1 (192.0.2.50 / tv.verpartido-hd.test, min 9–105): primer bloqueo 0.6 min · clientes cubiertos 100.0 % · visibilidad residual 1.8 %
+  tribuna fase 1 (203.0.113.40 / x9.tribuna-pirata.test, min 55–81): primer bloqueo 0.6 min · clientes cubiertos 100.0 % · visibilidad residual 4.6 %
+  tribuna fase 2 (203.0.113.41 / x10.tribuna-pirata.test, min 82–105): primer bloqueo 0.4 min · clientes cubiertos 100.0 % · visibilidad residual 3.8 %
+
+2. Daño colateral
+  aurora bloqueó ip 192.0.2.50 durante 4.0 min: 4 sitio(s) legítimo(s) — club-atletico-barrio-norte.test, escuela-tecnica-12.test, estudio-contable-ruiz.test, panaderia-la-espiga.test
+  andina bloqueó ip 192.0.2.50 durante 4.0 min: 4 sitio(s) legítimo(s) — club-atletico-barrio-norte.test, escuela-tecnica-12.test, estudio-contable-ruiz.test, panaderia-la-espiga.test
+  cumbre bloqueó ip 192.0.2.50 durante 4.0 min: 4 sitio(s) legítimo(s) — club-atletico-barrio-norte.test, escuela-tecnica-12.test, estudio-contable-ruiz.test, panaderia-la-espiga.test
+
+3. Falsos positivos bloqueados
+  Ninguno.
+
+4. Bloqueos activos después del partido (minuto 110)
+  Por ip (deberían haber vencido): 0
+  Por dominio (informativo): 0
+
+5. Reclamos de sitios afectados
+  R-001 panaderia-la-espiga.test (aurora, min 13.5): levantada en 0.0 min
+  R-002 panaderia-la-espiga.test (andina, min 14.8): levantada en 0.0 min
+  R-003 panaderia-la-espiga.test (cumbre, min 20.0): levantada en 0.0 min
+
+6. Órdenes rechazadas por los proveedores
+  Ninguna.
+
+7. Órdenes firmadas por un juez fuera de turno
+  Ninguna.
+(exit 0)

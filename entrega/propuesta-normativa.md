@@ -6,7 +6,7 @@
 
 El juez competente libra **una sola orden marco por evento deportivo**, antes o al inicio del mismo, que autoriza a la plataforma (fiscalía/titular de derechos) a **incorporar dinámicamente direcciones IP y FQDN verificados pericialmente** durante la duración del evento. Cada incorporación queda asentada como actuación numerada en el expediente electrónico con evidencia verificable (captura + hash + sello de tiempo), y queda a disposición del juez para control posterior inmediato.
 
-**Por qué:** hoy cada bloqueo requiere intervención judicial individual; a la velocidad de la piratería en vivo (minutos), el circuito manual hace imposible llegar a tiempo sin convertir la firma en un trámite vacío. La orden marco conserva el control judicial real (define el perímetro: qué señal, qué evento, qué tipo de medida) sin convertir al juez en cuello de botella.
+**Por qué:** la ley ya exige orden judicial para que un prestador bloquee contenidos (Ley 27.078, art. 57 inc. a); hoy cada bloqueo requiere intervención judicial individual; a la velocidad de la piratería en vivo (minutos), el circuito manual hace imposible llegar a tiempo sin convertir la firma en un trámite vacío. La orden marco conserva el control judicial real (define el perímetro: qué señal, qué evento, qué tipo de medida) sin convertir al juez en cuello de botella.
 
 ## 2. Registro Federal Único de Prestadores de Acceso (RFPA)
 
@@ -16,7 +16,7 @@ Todo ISP que opere en el país —incluidos cooperativas y proveedores regionale
 
 ## 3. Proporcionalidad técnica: prohibición de bloqueos de IP compartidas
 
-Toda medida debe ser precedida de una **verificación de coexistencia** (DNS pasivo o fuente equivalente) que acredite si la dirección IP aloja servicios ajenos al infractor. Si existe coexistencia, está **prohibido el bloqueo por IP** y la medida debe circunscribirse al FQDN infractor. La verificación queda agregada al expediente como peritaje.
+Toda medida debe ser precedida de una **verificación de coexistencia** (DNS pasivo o fuente equivalente) que acredite si la dirección IP aloja servicios ajenos al infractor. Si existe coexistencia, está **prohibido el bloqueo por IP** y la medida debe circunscribirse al FQDN infractor. La verificación queda agregada al expediente como peritaje (examen caso por caso previo a toda restricción, en la línea de CSJN, "Rodríguez, María Belén c/ Google", 2014).
 
 **Por qué:** bloquear una IP compartida derriba sitios legítimos (panaderías, municipios, medios) — es el daño colateral que ya generó incidentes en Italia (Piracy Shield) y la principal objeción de las cámaras de proveedores.
 
@@ -44,7 +44,7 @@ Todo titular de un sitio afectado puede reclamar por **vía digital sumarísima*
 
 La plataforma debe operar con **jueces de turno identificados**: cada magistrado ingresa con su propio usuario y firma solo mientras está de turno; nadie —ni la fiscalía, ni el sistema— firma en su nombre. Al cambio de turno, los expedientes pendientes pasan automáticamente al juez entrante y el saliente pierde la capacidad de firma. Si una aprobación queda en el borde del turno, se re-eleva al entrante.
 
-**Por qué:** la firma digital del juez es el acto que habilita la injerencia estatal; delegarla a un proceso automático vaciaría la garantía judicial. Los turnos son la única forma realista de sostener control humano durante un evento de dos horas sin agotar a una sola persona.
+**Por qué:** la firma digital del juez (en producción, con certificado propio en los términos de la Ley 25.506; el HMAC del simulador es un sustituto de demostración) es el acto que habilita la injerencia estatal; delegarla a un proceso automático vaciaría la garantía judicial. Los turnos son la única forma realista de sostener control humano durante un evento de dos horas sin agotar a una sola persona.
 
 ---
 

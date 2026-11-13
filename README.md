@@ -86,18 +86,28 @@ Flags útiles del simulador: `--acelerar 60` (partido en ~2 min para iterar) · 
 ### Resultados en el escenario de práctica
 
 `verificar.py` sobre la última corrida completa **en modo interactivo**
-(desde minuto 0, aceleración ×60, incluyendo la demo de reclamos con
-`forzar-ip` sobre la IP compartida):
+(desde minuto 0, aceleración ×6, el juez firma desde la consola web —
+`scripts/juez_click.py --lote`, con «Aprobar todo» — incluyendo la demo de
+reclamos con `forzar-ip` sobre la IP compartida). Salidas textuales
+completas en `entrega/validacion/`:
 
 ```
-fases piratas bloqueadas: 7 de 7      visibilidad residual: 7,3 %
-clientes cubiertos: 100 % en todas las fases   (primer bloqueo: 0,6–7,2 min)
-falsos positivos / rechazos / órdenes fuera de turno / IP activas post-partido: 0
-reclamos (provocados para la demo): 3/3 levantados firmados en < 1 min
+fases piratas bloqueadas: 7 de 7      visibilidad residual: 3,2 %
+falsos positivos / rechazos / órdenes fuera de turno: 0
+reclamos (provocados para la demo): 3/3 resueltos por levantamiento
 colateral de la demo: 3 bloqueos IP sobre 4 sitios legítimos, todos levantados
 cadena de custodia: ÍNTEGRA (180 actuaciones, 38 evidencias, 33 órdenes)
-expedientes: los 7 cerrados a 'archivo' al vencer la ventana (min 105 + gracia)
 ```
+
+Comparación con el cliente de referencia de la organización
+(`ejemplos/cliente_minimo.py`), mismo escenario y mismo evaluador:
+
+| | Cliente de ejemplo (org) | Esta plataforma |
+|---|---|---|
+| Fases piratas bloqueadas | 1 de 7 | **7 de 7** |
+| Visibilidad residual promedio | 86,6 % | **3,2 %** |
+| Firma | sin juez | juez de turno, desde la consola |
+| Órdenes fuera de turno / falsos positivos | — | 0 / 0 |
 
 ### Supuestos y decisiones de diseño
 

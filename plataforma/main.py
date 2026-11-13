@@ -89,6 +89,9 @@ def main() -> None:
     p.add_argument("--puerto-ui", type=int, default=config.PUERTO_UI)
     p.add_argument("--reset", action="store_true", help="borra la BD al arrancar")
     p.add_argument("--sin-ui", action="store_true")
+    p.add_argument("--red", action="store_true",
+                   help="consola en 0.0.0.0 (jueces desde la wifi local); "
+                        "por defecto solo 127.0.0.1")
     p.add_argument("--exportar", action="store_true",
                    help="exporta entrega/ y sale")
     args = p.parse_args()
@@ -125,9 +128,21 @@ def main() -> None:
         from .juez.servidor_ui import ServidorUI
         ServidorUI(reloj, turnos, dispatcher, args.puerto_ui,
                    modo=args.modo, poller=poller, verificador=verificador,
-                   gestor=gestor).start()
+                   gestor=gestor,
+                   host="0.0.0.0" if args.red else "127.0.0.1").start()
         print(f"[main] consola judicial: http://127.0.0.1:{args.puerto_ui} "
               f"(laura/martin, clave demo)")
+        if args.red:
+            import socket
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                s.connect(("10.255.255.255", 1))
+                ip_lan = s.getsockname()[0]
+                s.close()
+            except OSError:
+                ip_lan = "<ip-de-esta-notebook>"
+            print(f"[main] --red: consola en la wifi local: "
+                  f"http://{ip_lan}:{args.puerto_ui}")
 
     db.actuacion(None, "plataforma_iniciada",
                  f"Plataforma iniciada en modo {args.modo} contra {args.servidor}",

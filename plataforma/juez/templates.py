@@ -153,6 +153,11 @@ def bandeja(expedientes, juez: dict, turno_txt: str, minuto: float,
         banner = (f"<div class=aviso><b>⚠ {pend_n} actuación(es) esperando su "
                   f"firma.</b> Atajo de teclado: <span class=mono>A</span> "
                   f"aprueba la primera de la lista.</div>")
+    n_exp = pend_n - len(reclamos_pend)
+    if n_exp > 1 and puede_firmar:
+        banner += (f"<form method=post action='/exp/aprobar-todo' {_UNA_VEZ} "
+                   f"style='margin:8px 0'><button>Aprobar todo según "
+                   f"peritaje ({n_exp} expedientes)</button></form>")
     script = f"""<script>
 (function(){{
   var n={pend_n}, prev=+(sessionStorage.getItem('pend')||0);

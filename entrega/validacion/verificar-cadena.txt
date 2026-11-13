@@ -1,0 +1,4 @@
+$ python -m plataforma.auditoria.verificar_cadena entrega/registro-auditoria.json
+INTEGRIDAD OK — 180 actuacion(es), 38 evidencia(s) y 33 orden(es) verificadas en entrega/registro-auditoria.json
+toda alteración posterior a una actuación rompería la cadena
+(exit 0)

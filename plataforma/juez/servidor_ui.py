@@ -5,6 +5,7 @@ Rutas:
   GET  /                                        — bandeja de expedientes
   GET  /exp/<id>                                — detalle del expediente
   POST /exp/<id>/aprobar                        — firma y despacho (solo de turno)
+  POST /exp/aprobar-todo                        — aprueba en lote todo lo elevado (de turno)
   POST /exp/<id>/forzar-ip                      — aprobar forzando tipo IP (demo reclamos)
   POST /exp/<id>/rechazar                       — archivar
   GET  /transparencia                           — público, sin login
@@ -36,8 +37,9 @@ SESIONES = {}  # sid -> juez dict {"id","nombre"}
 class ServidorUI(threading.Thread):
     def __init__(self, reloj, turnos, dispatcher, puerto: int,
                  modo: str = "auto", poller=None, verificador=None,
-                 gestor=None):
+                 gestor=None, host: str = "127.0.0.1"):
         super().__init__(daemon=True, name="Thread-WebUI")
+        self.host = host
         self.reloj = reloj
         self.turnos = turnos
         self.dispatcher = dispatcher
@@ -195,6 +197,8 @@ class ServidorUI(threading.Thread):
                 sesion = self._sesion()
                 if not sesion:
                     return self._redirect("/login")
+                if partes == ["exp", "aprobar-todo"]:
+                    return self._aprobar_todo(sesion)
                 if len(partes) == 3 and partes[0] == "reclamo" \
                         and partes[2] == "hacer-lugar":
                     return self._hacer_lugar(partes[1], sesion)
@@ -272,25 +276,54 @@ class ServidorUI(threading.Thread):
                         return self._redirect(f"/exp/{exp_id}?msg=fuera-turno")
                     if exp["estado"] not in ("detectado", "elevado"):
                         return self._redirect(f"/exp/{exp_id}?msg=ya-despachado")
-                    if accion == "forzar-ip":
-                        db.ejecutar("UPDATE expedientes SET "
-                                    "tipo_bloqueo_recomendado='ip' WHERE id=?",
-                                    (exp_id,))
-                        exp = db.q1("SELECT * FROM expedientes WHERE id=?", (exp_id,))
-                    juez_id = sesion["juez_id"]
-                    db.ejecutar("UPDATE expedientes SET aprobada_por=?, "
-                                "aprobada_min=? WHERE id=?",
-                                (juez_id, ahora, exp_id))
-                    ex.set_estado(exp_id, "aprobado")
-                    db.actuacion(exp_id, "dictamen",
-                                 f"Orden cautelar aprobada por {juez_id} "
-                                 f"({'forzando IP' if accion=='forzar-ip' else 'según peritaje'})",
-                                 ahora)
-                    ex.set_estado(exp_id, "en_ejecucion")
-                    ui.dispatcher.notificar_aprobacion(exp_id)
-                    ui.dispatcher.despachar_expediente(dict(exp))
+                    self._aprobar(exp_id, sesion["juez_id"], ahora,
+                                  accion == "forzar-ip")
                     return self._redirect(f"/exp/{exp_id}")
                 self._html(T.pagina("404", "No existe"), 404)
+
+            def _aprobar(self, exp_id, juez_id, ahora, forzar_ip=False):
+                if forzar_ip:
+                    db.ejecutar("UPDATE expedientes SET "
+                                "tipo_bloqueo_recomendado='ip' WHERE id=?",
+                                (exp_id,))
+                exp = db.q1("SELECT * FROM expedientes WHERE id=?", (exp_id,))
+                db.ejecutar("UPDATE expedientes SET aprobada_por=?, "
+                            "aprobada_min=? WHERE id=?",
+                            (juez_id, ahora, exp_id))
+                ex.set_estado(exp_id, "aprobado")
+                db.actuacion(exp_id, "dictamen",
+                             f"Orden cautelar aprobada por {juez_id} "
+                             f"({'forzando IP' if forzar_ip else 'según peritaje'})",
+                             ahora)
+                ex.set_estado(exp_id, "en_ejecucion")
+                ui.dispatcher.notificar_aprobacion(exp_id)
+                ui.dispatcher.despachar_expediente(dict(exp))
+
+            def _aprobar_todo(self, sesion):
+                """Firma en lote: aprueba según peritaje todo lo que espera
+                firma en el juzgado. Una actuación + aprobada_por por cada
+                expediente; el estado se re-lee bajo lock (anti doble clic)."""
+                if sesion.get("rol") != "juez":
+                    return self._redirect("/")
+                ahora = ui.reloj.ahora()
+                if not self._puede_firmar(sesion):
+                    db.actuacion(None, "dictamen",
+                                 f"Intento de firma en lote de "
+                                 f"{sesion['juez_id']} rechazado: no está "
+                                 f"de turno", ahora)
+                    return self._redirect("/?msg=fuera-turno")
+                for e in db.q("SELECT id FROM expedientes WHERE estado IN "
+                              "('detectado','elevado') AND dependencia="
+                              "'juzgado' ORDER BY creado_min"):
+                    with db.bloqueo():
+                        exp = db.q1("SELECT estado FROM expedientes "
+                                    "WHERE id=?", (e["id"],))
+                        if not exp or exp["estado"] not in ("detectado",
+                                                            "elevado"):
+                            continue
+                        ex.set_estado(e["id"], "aprobado")
+                    self._aprobar(e["id"], sesion["juez_id"], ahora)
+                return self._redirect("/")
 
             def _revision(self, exp, actor, ahora):
                 """Re-peritaje: re-consulta DNS pasivo y re-clasifica la medida."""
@@ -319,5 +352,5 @@ class ServidorUI(threading.Thread):
                         f"{exp['tipo_bloqueo_recomendado']} -> {tipo}", ahora)
                 return self._redirect(f"/exp/{exp_id}")
 
-        self.httpd = ThreadingHTTPServer(("127.0.0.1", self.puerto), H)
+        self.httpd = ThreadingHTTPServer((self.host, self.puerto), H)
         self.httpd.serve_forever()

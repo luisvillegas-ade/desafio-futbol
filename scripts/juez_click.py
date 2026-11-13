@@ -6,7 +6,10 @@ login del juez de turno -> aprobar expedientes elevados -> hacer lugar a
 reclamos elevados. Al cambio de turno re-loguea con el juez entrante.
 
 Uso (con la plataforma corriendo en --modo interactivo):
-    python scripts/juez_click.py [--forzar-ip tv.verpartido-hd.test]
+    python scripts/juez_click.py [--forzar-ip tv.verpartido-hd.test] [--lote]
+
+--lote: usa POST /exp/aprobar-todo (firma en lote) en vez de un clic por
+expediente.
 """
 import json
 import sqlite3
@@ -47,6 +50,7 @@ def main():
     forzar = None
     if "--forzar-ip" in sys.argv:
         forzar = sys.argv[sys.argv.index("--forzar-ip") + 1]
+    lote = "--lote" in sys.argv
     logueado = None
     ya_forzado = False
     while True:
@@ -70,8 +74,15 @@ def main():
                         ya_forzado = True
                     except Exception as e:
                         print(f"[juez] forzar-ip {exp_id}: {e}", flush=True)
-            for (exp_id,) in db_q(
-                    "SELECT id FROM expedientes WHERE estado='elevado'"):
+            elevados = db_q("SELECT id FROM expedientes WHERE estado='elevado'")
+            if lote and elevados:
+                try:
+                    post("/exp/aprobar-todo")
+                    print(f"[juez] aprobar-todo ({len(elevados)})", flush=True)
+                except Exception as e:
+                    print(f"[juez] aprobar-todo: {e}", flush=True)
+                elevados = []
+            for (exp_id,) in elevados:
                 try:
                     post(f"/exp/{exp_id}/aprobar")
                     print(f"[juez] aprobado {exp_id}", flush=True)
