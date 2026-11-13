@@ -21,9 +21,14 @@ font-size:11px;line-height:1.4}
 a{color:#38BDF8;text-decoration:none}
 .grid{display:grid;gap:6px;padding:6px;height:100vh;
 grid-template-columns:250px 1fr;
-grid-template-rows:auto auto minmax(0,1fr) minmax(110px,26vh) auto;
+grid-template-rows:auto auto minmax(0,1fr) 30px auto;
 grid-template-areas:"hdr hdr" "legend legend" "side center" "log log"
  "status status"}
+.grid.logexp{grid-template-rows:auto auto minmax(0,1fr) minmax(90px,20vh) auto}
+.grid.logexp #logf{overflow-y:auto}
+.grid:not(.logexp) #log{display:none}
+.grid:not(.logexp) #logf{overflow:hidden}
+#logf legend{cursor:pointer;user-select:none}
 fieldset{border:1px solid #27272A;background:#111113;margin:0;padding:5px 8px;
 border-radius:0;min-width:0;min-height:0;overflow:hidden}
 legend{padding:0 5px;color:#71717A;font-size:10px;letter-spacing:.6px}
@@ -348,9 +353,13 @@ def pagina() -> str:
 <fieldset style="grid-area:legend"><legend>leyenda</legend><div id=legend>…</div></fieldset>
 <fieldset class=scroll style="grid-area:side"><legend>bitácora · reglas procesales</legend><div id=bitacora>…</div></fieldset>
 <fieldset style="grid-area:center"><legend>orquestación cautelar — circuito en vivo</legend><div id=grafo>…</div></fieldset>
-<fieldset class=scroll style="grid-area:log"><legend>session log — cadena de custodia en vivo</legend><div id=log>…</div></fieldset>
+<fieldset id=logf class=scroll style="grid-area:log"><legend id=leglog>session log — cadena de custodia en vivo ▾</legend><div id=log>…</div></fieldset>
 <fieldset style="grid-area:status"><legend>status</legend><div id=status>…</div></fieldset>
 </div><script>
+document.getElementById('leglog').onclick=function(){{
+  var g=document.querySelector('.grid'),on=g.classList.toggle('logexp');
+  this.textContent='session log — cadena de custodia en vivo '+(on?'▴':'▾');
+}};
 async function tick(){{
   try{{
     const r = await fetch('/monitor/datos');
