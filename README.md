@@ -1,5 +1,9 @@
 # DEOB + SICRE: Juzgado Digital de Bloqueo en Vivo
 
+<p align="center">
+  <img src="docs/logo-deob.jpg" alt="DEOB Logo" width="380" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);" />
+</p>
+
 **Sistema Federal de Medidas Cautelares en Vivo y Tutela de Terceros Afectados**  
 *Hackathon Argentina Space 2026 · Track Datos y Streaming (QualyData) · Salta, 11 al 13 de noviembre de 2026*  
 **Autor:** Luis Alberto Villegas ([@luisvillegas-ade](https://github.com/luisvillegas-ade))  
