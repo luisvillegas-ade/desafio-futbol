@@ -1,0 +1,4 @@
+salida/
+plataforma/datos_app/
+**/__pycache__/
+*.db

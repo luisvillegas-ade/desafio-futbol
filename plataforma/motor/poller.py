@@ -90,11 +90,26 @@ class Poller(threading.Thread):
 
     def _trabajador_reclamos(self) -> None:
         while True:
-            r = self.cola_reclamos.get()
+            if db.PG:                    # web desplegada: ver decisiones_web
+                try:
+                    r = self.cola_reclamos.get(timeout=config.POLL_SEGUNDOS)
+                except queue.Empty:
+                    self._decisiones_web()
+                    continue
+            else:
+                r = self.cola_reclamos.get()
             try:
                 self.reclamos.procesar(r)
             except Exception as e:
                 print(f"[reclamos] error con {r.get('id')}: {e}", flush=True)
+
+    def _decisiones_web(self) -> None:
+        from . import decisiones_web
+        try:
+            decisiones_web.publicar_reloj(self.reloj)
+            decisiones_web.procesar(self.dispatcher, self.reclamos)
+        except Exception as e:
+            print(f"[web] error: {e}", flush=True)
 
     def _trabajador(self) -> None:
         while True:
