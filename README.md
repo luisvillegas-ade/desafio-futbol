@@ -123,7 +123,7 @@ Comparación con el cliente de referencia de la organización
 
 ### Supuestos y decisiones de diseño
 
-- **SQLite única como SSOT** (`plataforma/datos_app/plataforma.db`) con un lock global: la carga es baja y elimina cualquier problema de concurrencia.
+- **SQLite como SSOT por defecto** (`plataforma/datos_app/plataforma.db`) con un lock global: la carga es baja y elimina cualquier problema de concurrencia. Con `DATABASE_URL=postgres://...` el mismo `db.py` usa Postgres (Neon) para la vidriera en línea; la foliación de actuaciones es atómica en ambos backends y los hashes son idénticos.
 - **`vence_min` entero = `fin_min` del partido**: los bloqueos por IP vencen solos al terminar (propuesta normativa, punto 4). Al vencer la ventana (fin + 5 min de gracia) la plataforma asienta la actuación `vencimiento` en cada expediente y los pasa a `cerrado`/`archivo`.
 - **Firma judicial personal**: en `modo interactivo` la orden solo se firma con la clave del juez que hizo clic aprobando, y solo si sigue de turno con margen seguro; de lo contrario se re-eleva al entrante. `modo auto` queda para pruebas internas (la "orden marco" es un punto de la propuesta normativa, no un atajo del MVP).
 - Las claves de firma se leen de `datos/juzgados.json` (las del material del desafío; no hay secretos reales en el repo).
@@ -138,6 +138,7 @@ Código escrito durante el hackathon (todo stdlib):
 - `scripts/juez_click.py`, `scripts/test_reclamo.py` — pruebas automatizadas del circuito interactivo y de reclamos.
 - `GRABAR-VIDEO.md` — guion paso a paso del video ≤ 3 min.
 - `AGENTS.md` — bitácora técnica completa (quirks del simulador verificados, arquitectura, resultados).
+- `plataforma/api/` + `api/index.py` + `vercel.json` + `requirements.txt` — capa web opcional (FastAPI) para Vercel/Neon; `PLAN-VERCEL.md` es su plan. El motor no la importa.
 
 Entregables del día 3:
 
