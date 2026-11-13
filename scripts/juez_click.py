@@ -20,7 +20,7 @@ import urllib.parse
 import urllib.request
 
 UI = os.environ.get("JUEZ_UI", "http://127.0.0.1:8090")
-SIM = "http://127.0.0.1:8080"
+SIM = os.environ.get("SIMULADOR_URL", "http://127.0.0.1:8080").rstrip("/")
 DB = "plataforma/datos_app/plataforma.db"
 USUARIO = {"jueza-laura-ficticia": "laura", "juez-martin-ejemplo": "martin"}
 
@@ -33,8 +33,11 @@ def post(ruta, datos=None):
 
 def turno():
     try:
-        with urllib.request.urlopen(SIM + "/estado", timeout=3) as r:
-            return json.load(r).get("jueces_de_turno", [])
+        sys.path.insert(0, os.path.dirname(os.path.dirname(
+            os.path.abspath(__file__))))
+        from plataforma.cliente_sim import ClienteSim
+        return ClienteSim(SIM, timeout=5).get("/estado")[1].get(
+            "jueces_de_turno", [])
     except Exception:
         return []
 
